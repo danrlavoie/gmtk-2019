@@ -60,11 +60,13 @@ public class Player extends Rectangle {
     public void moveX() {
         this.x += 14 * (this.xSpeed * Gdx.graphics.getDeltaTime());
         if (this.x < 0) this.x = 0;
-        if (this.x > GMTKGame.CANVAS_WIDTH) this.x = GMTKGame.CANVAS_WIDTH;
+        if (this.x > ( GMTKGame.CANVAS_WIDTH - this.width))
+            this.x = (GMTKGame.CANVAS_WIDTH - this.width);
     }
     public void moveY() {
         this.y += 14 * (this.ySpeed * Gdx.graphics.getDeltaTime());
         if (this.y < 0) this.y = 0;
-        if (this.y > GMTKGame.CANVAS_HEIGHT) this.y = GMTKGame.CANVAS_HEIGHT;
+        if (this.y > ( GMTKGame.CANVAS_HEIGHT - this.height))
+            this.y = ( GMTKGame.CANVAS_HEIGHT - this.height);
     }
 }
