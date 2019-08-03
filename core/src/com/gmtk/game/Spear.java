@@ -49,6 +49,7 @@ public class Spear extends Sprite {
             if (this.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
                 this.setPosition(oldX + (3 * deltaX), oldY + (3 *deltaY));
                 this.setSpeed(0);
+                this.wasThrown = false;
             }
         }
     }

@@ -156,13 +156,13 @@ public class GMTKGame extends ApplicationAdapter {
 
 		for (Spear s : spears) {
 		    if (player.hasSpear(s) && chargingThrow) {
-                s.setRotation(rightStick.angle());
+                s.setRotation(rightStick.angle() + 180);
             }
 		    else {
 		        if (throwing) {
 		            s.setSpeed(throwSpeed);
 		            s.setWasThrown(true);
-		            s.setRotation(s.getRotation() + 180);
+		            s.setRotation(s.getRotation());
 		            throwing = false;
 		            throwSpeed = 0;
                 }
@@ -170,9 +170,17 @@ public class GMTKGame extends ApplicationAdapter {
 		    if (s.getWasThrown()) {
 		        s.move(walls);
             }
-		    else {
-                s.setPosition(player.getX(), player.getY());
+		    if (!s.getWasThrown() && player.hasSpear(s)) {
+                s.setPosition(
+                	(player.getX() ),
+					(player.getY() + s.getHeight())
+				);
             }
+		    if (!s.getWasThrown() && !player.hasASpear()) {
+		    	if (s.getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
+		    		player.setSpear(s);
+				}
+			}
 //		    Gdx.app.log("SPEAR ANGLE: ", Float.toString(s.getRotation()));
         }
 
