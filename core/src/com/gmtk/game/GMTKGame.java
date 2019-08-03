@@ -17,20 +17,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class GMTKGame extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture playerImage;
-	Texture spearImage;
-	Texture wallImage;
-
-	Animation<TextureRegion> idleAnimation;
-	Animation<TextureRegion> walkAnimation;
-	Animation<TextureRegion> throwAnimation;
-	Animation<TextureRegion> hurtAnimation;
-	Animation<TextureRegion> dieAnimation;
-	Animation<TextureRegion> currentAnimation;
-	Texture playerSheet;
-
-	float animationTime;
+    Renderer renderer;
 
 	Player player;
 	GameController gameController;
@@ -46,50 +33,15 @@ public class GMTKGame extends ApplicationAdapter {
 
 	public Vector2 rightStick;
 	public float throwSpeed;
-	final public static int MAX_THROW_SPEED = 500;
+	final public static int MAX_THROW_SPEED = 700;
 
 	public float leftStickDebounce;
 	public float rightStickDebounce;
 	
 	@Override
 	public void create () {
-		playerImage = new Texture(Gdx.files.internal("bucket.png"));
-		spearImage = new Texture(Gdx.files.internal("spear.png"));
-		wallImage = new Texture(Gdx.files.internal("wall.png"));
-		playerSheet = new Texture(Gdx.files.internal("player.png"));
+	    renderer = new Renderer();
 
-		TextureRegion[][] tmp = TextureRegion.split(playerSheet, 64, 64);
-		TextureRegion[] idleFrames = new TextureRegion[5];
-		for (int i = 0; i < 5; i++) {
-			idleFrames[i] = tmp[0][i];
-		}
-		TextureRegion[] walkFrames = new TextureRegion[8];
-		for (int i = 0; i < 8; i++) {
-			walkFrames[i] = tmp[1][i];
-		}
-		TextureRegion[] throwFrames = new TextureRegion[7];
-		for (int i = 0; i < 7; i++) {
-			throwFrames[i] = tmp[2][i];
-		}
-		TextureRegion[] hurtFrames = new TextureRegion[3];
-		for (int i = 0; i < 3; i++) {
-			hurtFrames[i] = tmp[3][i];
-		}
-		TextureRegion[] dieFrames = new TextureRegion[7];
-		for (int i = 0; i < 7; i++) {
-			dieFrames[i] = tmp[4][i];
-		}
-
-		idleAnimation = new Animation<TextureRegion>(0.1f, idleFrames);
-		walkAnimation = new Animation<TextureRegion>(0.1f, walkFrames);
-		throwAnimation = new Animation<TextureRegion>(0.1f, throwFrames);
-		hurtAnimation = new Animation<TextureRegion>(0.1f, hurtFrames);
-		dieAnimation = new Animation<TextureRegion>(0.1f, dieFrames);
-		currentAnimation = idleAnimation;
-		animationTime = 0f;
-
-
-		batch = new SpriteBatch();
 
 		gameController = new GameController(this);
 		Gdx.app.log("CONTROLLERS", Controllers.getControllers().toString());
@@ -107,11 +59,11 @@ public class GMTKGame extends ApplicationAdapter {
 
 		walls = new Array<Sprite>();
 		spawnWalls();
-		player = new Player(playerImage, spears.first());
+		player = new Player(renderer.playerImage, spears.first());
 	}
 
 	private void spawnSpear() {
-	    Spear spear = new Spear(spearImage);
+	    Spear spear = new Spear(renderer.spearImage);
 	    spears.add(spear);
     }
 
@@ -129,12 +81,17 @@ public class GMTKGame extends ApplicationAdapter {
 				180,
 		};
 		for (int i = 0; i < coordinates.length; i++ ) {
-			Sprite wall = new Sprite(wallImage);
+			Sprite wall = new Sprite(renderer.wallImage);
 			wall.setRotation(rotation[i]);
 			wall.setPosition(coordinates[i][0], coordinates[i][1]);
 			walls.add(wall);
 		}
 	}
+
+	private void spawnEnemy() {
+	    Enemy e = new Enemy();
+
+    }
 
     public void resetSpear() {
 	    Spear s = spears.first();
@@ -151,74 +108,15 @@ public class GMTKGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0.8f, 0.8f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		animationTime += Gdx.graphics.getDeltaTime();
 
-        drawSprites();
+        renderer.drawSprites(player, spears, walls);
 
 		handleThrowMechanics();
         movePlayer();
         moveSpears();
 	}
 
-	private void drawSprites() {
-        batch.begin();
-        for (Sprite w : walls) {
-            w.draw(batch);
-        }
-        if (
-        		(player.isChargingThrow() || player.isThrowing())
-		) {
-        	player.setCurrentState(Player.PlayerState.THROWING);
-		}
-        else if (
-        		player.isMoving()
-		) {
-        	player.setCurrentState(Player.PlayerState.WALKING);
-		}
-        else {
-        	player.setCurrentState(Player.PlayerState.IDLE);
-		}
-		switch(player.getCurrentState()) {
-			case WALKING:
-				currentAnimation = walkAnimation;
-				break;
-			case HURT:
-				currentAnimation = hurtAnimation;
-				break;
-			case DYING:
-				currentAnimation = dieAnimation;
-				break;
-			case THROWING:
-				currentAnimation = throwAnimation;
-				break;
-			default:
-				currentAnimation = idleAnimation;
-		}
-        TextureRegion currentFrame;
-        if (player.isChargingThrow()) {
-        	// Charging throw, hold on the first animation frame
-			currentFrame = currentAnimation.getKeyFrames()[0];
-			animationTime -= Gdx.graphics.getDeltaTime();
-		}
-        else {
-			currentFrame = currentAnimation.getKeyFrame(animationTime, false);
-		}
-        if (currentAnimation.isAnimationFinished(animationTime)) {
-        	animationTime = 0f;
-		}
-        boolean flip = (player.isMovingRight());
-		batch.draw(
-				currentFrame,
-				flip ? player.getX() + player.getWidth() : player.getX(),
-				player.getY(),
-				flip ? -player.getWidth() : player.getWidth(),
-				player.getHeight()
-		);
-        for (Spear s : spears) {
-            s.draw(batch);
-        }
-        batch.end();
-    }
+
 
 	private void handleThrowMechanics() {
         rightStick.x = rightXAxisValue;
@@ -231,7 +129,7 @@ public class GMTKGame extends ApplicationAdapter {
                 }
             } else {
                 if (!(rightStick.x == 0 && rightStick.y == 0)) {
-                    throwSpeed += 500 * Gdx.graphics.getDeltaTime();
+                    throwSpeed += 600 * Gdx.graphics.getDeltaTime();
                     if (throwSpeed > MAX_THROW_SPEED) {
                         throwSpeed = MAX_THROW_SPEED;
                     }
@@ -304,10 +202,6 @@ public class GMTKGame extends ApplicationAdapter {
 	
 	@Override
 	public void dispose () {
-		batch.dispose();
-		playerImage.dispose();
-		playerSheet.dispose();
-		spearImage.dispose();
-		wallImage.dispose();
+	    renderer.dispose();
 	}
 }
