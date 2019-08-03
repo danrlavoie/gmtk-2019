@@ -50,7 +50,6 @@ public class GMTKGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, CANVAS_WIDTH, CANVAS_HEIGHT);
-		player = new Player(playerImage);
 
 		gameController = new GameController(this);
 		Gdx.app.log("CONTROLLERS", Controllers.getControllers().toString());
@@ -70,6 +69,7 @@ public class GMTKGame extends ApplicationAdapter {
 
 		walls = new Array<Sprite>();
 		spawnWalls();
+		player = new Player(playerImage, spears.first());
 	}
 
 	private void spawnSpear() {
@@ -99,10 +99,11 @@ public class GMTKGame extends ApplicationAdapter {
 	}
 
     public void resetSpear() {
-	    for (Spear s : spears) {
-	        s.setPosition(player.getX(), player.getY());
-	        s.setWasThrown(false);
-        }
+	    Spear s = spears.first();
+	    s.setPosition(player.getX(), player.getY());
+	    s.setWasThrown(false);
+	    player.setSpear(s);
+
 	    throwing = false;
 	    chargingThrow = false;
     }
@@ -116,43 +117,45 @@ public class GMTKGame extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
+		for (Sprite w : walls) {
+			w.draw(batch);
+		}
 		batch.draw(playerImage, player.getX(), player.getY());
 
 		for (Spear s : spears) {
 		    s.draw(batch);
         }
-		for (Sprite w : walls) {
-			w.draw(batch);
-		}
 		batch.end();
 
-		player.accelerateX(leftXAxisValue);
-		player.accelerateY(leftYAxisValue);
-		player.moveX();
-		player.moveY();
 		rightStick.x = rightXAxisValue;
 		rightStick.y = -rightYAxisValue;
 
-		if (!chargingThrow) {
-		    if (!(rightStick.x == 0 && rightStick.y == 0)) {
-		        chargingThrow = true;
-            }
-        }
-		else {
-            if (!(rightStick.x == 0 && rightStick.y == 0)) {
-                throwSpeed += 500 * Gdx.graphics.getDeltaTime();
-                if (throwSpeed > MAX_THROW_SPEED) {
-                    throwSpeed = MAX_THROW_SPEED;
-                }
-            }
-            else {
-                throwing = true;
-                chargingThrow = false;
-            }
-        }
+		if (player.hasASpear()) {
+			if (!chargingThrow) {
+				if (!(rightStick.x == 0 && rightStick.y == 0)) {
+					chargingThrow = true;
+				}
+			} else {
+				if (!(rightStick.x == 0 && rightStick.y == 0)) {
+					throwSpeed += 500 * Gdx.graphics.getDeltaTime();
+					if (throwSpeed > MAX_THROW_SPEED) {
+						throwSpeed = MAX_THROW_SPEED;
+					}
+				} else {
+					throwing = true;
+					chargingThrow = false;
+					player.setSpear(null);
+				}
+			}
+		}
+
+		player.accelerateX(leftXAxisValue);
+		player.accelerateY(leftYAxisValue);
+		player.moveX(walls);
+		player.moveY(walls);
 
 		for (Spear s : spears) {
-		    if (!(rightStick.x == 0 && rightStick.y == 0)) {
+		    if (player.hasSpear(s) && chargingThrow) {
                 s.setRotation(rightStick.angle());
             }
 		    else {
@@ -165,7 +168,7 @@ public class GMTKGame extends ApplicationAdapter {
                 }
             }
 		    if (s.getWasThrown()) {
-		        s.move();
+		        s.move(walls);
             }
 		    else {
                 s.setPosition(player.getX(), player.getY());
@@ -173,11 +176,6 @@ public class GMTKGame extends ApplicationAdapter {
 //		    Gdx.app.log("SPEAR ANGLE: ", Float.toString(s.getRotation()));
         }
 
-		for (Sprite w : walls) {
-			if (player.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
-				Gdx.app.log("COLLISION: ", "wall");
-			}
-		}
 //		Gdx.app.log("THROW SPEED: ", Float.toString(throwSpeed));
 	}
 	

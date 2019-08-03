@@ -3,6 +3,7 @@ package com.gmtk.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.utils.Array;
 
 public class Spear extends Sprite {
     private float speed;
@@ -30,18 +31,25 @@ public class Spear extends Sprite {
     public void setSpeed(float value) {
         this.speed = value;
     }
-    public void move() {
-        this.translate(
-                (float)(
+    public void move(Array<Sprite> walls) {
+        float oldX = this.getX();
+        float oldY = this.getY();
+        float deltaX = (float)(
             this.speed *
             Gdx.graphics.getDeltaTime() *
             Math.cos(Math.toRadians(this.getRotation()))
-        ),
-                (float)(
+        );
+        float deltaY = (float)(
             this.speed *
             Gdx.graphics.getDeltaTime() *
             Math.sin(Math.toRadians(this.getRotation()))
-        )
         );
+        this.translate(deltaX, deltaY);
+        for (Sprite w : walls) {
+            if (this.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
+                this.setPosition(oldX + (3 * deltaX), oldY + (3 *deltaY));
+                this.setSpeed(0);
+            }
+        }
     }
 }
