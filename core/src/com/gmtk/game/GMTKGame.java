@@ -8,8 +8,10 @@ import com.badlogic.gdx.controllers.mappings.Xbox;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -20,8 +22,17 @@ public class GMTKGame extends ApplicationAdapter {
 	Texture spearImage;
 	Texture wallImage;
 
+	Animation<TextureRegion> idleAnimation;
+	Animation<TextureRegion> walkAnimation;
+	Animation<TextureRegion> throwAnimation;
+	Animation<TextureRegion> hurtAnimation;
+	Animation<TextureRegion> dieAnimation;
+	Animation<TextureRegion> currentAnimation;
+	Texture playerSheet;
+
+	float animationTime;
+
 	Player player;
-	OrthographicCamera camera;
 	GameController gameController;
 
 	private Array<Spear> spears;
@@ -33,8 +44,6 @@ public class GMTKGame extends ApplicationAdapter {
 	public float leftXAxisValue, rightXAxisValue;
 	public float leftYAxisValue, rightYAxisValue;
 
-	public boolean chargingThrow;
-	public boolean throwing;
 	public Vector2 rightStick;
 	public float throwSpeed;
 	final public static int MAX_THROW_SPEED = 500;
@@ -47,9 +56,40 @@ public class GMTKGame extends ApplicationAdapter {
 		playerImage = new Texture(Gdx.files.internal("bucket.png"));
 		spearImage = new Texture(Gdx.files.internal("spear.png"));
 		wallImage = new Texture(Gdx.files.internal("wall.png"));
+		playerSheet = new Texture(Gdx.files.internal("player.png"));
+
+		TextureRegion[][] tmp = TextureRegion.split(playerSheet, 64, 64);
+		TextureRegion[] idleFrames = new TextureRegion[5];
+		for (int i = 0; i < 5; i++) {
+			idleFrames[i] = tmp[0][i];
+		}
+		TextureRegion[] walkFrames = new TextureRegion[8];
+		for (int i = 0; i < 8; i++) {
+			walkFrames[i] = tmp[1][i];
+		}
+		TextureRegion[] throwFrames = new TextureRegion[7];
+		for (int i = 0; i < 7; i++) {
+			throwFrames[i] = tmp[2][i];
+		}
+		TextureRegion[] hurtFrames = new TextureRegion[3];
+		for (int i = 0; i < 3; i++) {
+			hurtFrames[i] = tmp[3][i];
+		}
+		TextureRegion[] dieFrames = new TextureRegion[7];
+		for (int i = 0; i < 7; i++) {
+			dieFrames[i] = tmp[4][i];
+		}
+
+		idleAnimation = new Animation<TextureRegion>(0.1f, idleFrames);
+		walkAnimation = new Animation<TextureRegion>(0.1f, walkFrames);
+		throwAnimation = new Animation<TextureRegion>(0.1f, throwFrames);
+		hurtAnimation = new Animation<TextureRegion>(0.1f, hurtFrames);
+		dieAnimation = new Animation<TextureRegion>(0.1f, dieFrames);
+		currentAnimation = idleAnimation;
+		animationTime = 0f;
+
+
 		batch = new SpriteBatch();
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, CANVAS_WIDTH, CANVAS_HEIGHT);
 
 		gameController = new GameController(this);
 		Gdx.app.log("CONTROLLERS", Controllers.getControllers().toString());
@@ -62,8 +102,6 @@ public class GMTKGame extends ApplicationAdapter {
 		leftStickDebounce = 0;
 		rightStickDebounce = 0;
 
-		chargingThrow = false;
-		throwing = false;
 		spears = new Array<Spear>();
 		spawnSpear();
 
@@ -104,15 +142,16 @@ public class GMTKGame extends ApplicationAdapter {
 	    s.setWasThrown(false);
 	    player.setSpear(s);
 
-	    throwing = false;
-	    chargingThrow = false;
+	    player.setThrowing(false);
+	    player.setChargingThrow(false);
     }
 
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(0.8f, 0.8f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		camera.update();
+
+		animationTime += Gdx.graphics.getDeltaTime();
 
         drawSprites();
 
@@ -122,13 +161,59 @@ public class GMTKGame extends ApplicationAdapter {
 	}
 
 	private void drawSprites() {
-        batch.setProjectionMatrix(camera.combined);
         batch.begin();
         for (Sprite w : walls) {
             w.draw(batch);
         }
-        batch.draw(playerImage, player.getX(), player.getY());
-
+        if (
+        		(player.isChargingThrow() || player.isThrowing())
+		) {
+        	player.setCurrentState(Player.PlayerState.THROWING);
+		}
+        else if (
+        		player.isMoving()
+		) {
+        	player.setCurrentState(Player.PlayerState.WALKING);
+		}
+        else {
+        	player.setCurrentState(Player.PlayerState.IDLE);
+		}
+		switch(player.getCurrentState()) {
+			case WALKING:
+				currentAnimation = walkAnimation;
+				break;
+			case HURT:
+				currentAnimation = hurtAnimation;
+				break;
+			case DYING:
+				currentAnimation = dieAnimation;
+				break;
+			case THROWING:
+				currentAnimation = throwAnimation;
+				break;
+			default:
+				currentAnimation = idleAnimation;
+		}
+        TextureRegion currentFrame;
+        if (player.isChargingThrow()) {
+        	// Charging throw, hold on the first animation frame
+			currentFrame = currentAnimation.getKeyFrames()[0];
+			animationTime -= Gdx.graphics.getDeltaTime();
+		}
+        else {
+			currentFrame = currentAnimation.getKeyFrame(animationTime, false);
+		}
+        if (currentAnimation.isAnimationFinished(animationTime)) {
+        	animationTime = 0f;
+		}
+        boolean flip = (player.isMovingRight());
+		batch.draw(
+				currentFrame,
+				flip ? player.getX() + player.getWidth() : player.getX(),
+				player.getY(),
+				flip ? -player.getWidth() : player.getWidth(),
+				player.getHeight()
+		);
         for (Spear s : spears) {
             s.draw(batch);
         }
@@ -140,9 +225,9 @@ public class GMTKGame extends ApplicationAdapter {
         rightStick.y = -rightYAxisValue;
 
         if (player.hasASpear()) {
-            if (!chargingThrow) {
+            if (!player.isChargingThrow()) {
                 if (!(rightStick.x == 0 && rightStick.y == 0)) {
-                    chargingThrow = true;
+                    player.setChargingThrow(true);
                 }
             } else {
                 if (!(rightStick.x == 0 && rightStick.y == 0)) {
@@ -151,8 +236,8 @@ public class GMTKGame extends ApplicationAdapter {
                         throwSpeed = MAX_THROW_SPEED;
                     }
                 } else {
-                    throwing = true;
-                    chargingThrow = false;
+                    player.setThrowing(true);
+                    player.setChargingThrow(false);
                     player.setSpear(null);
                 }
             }
@@ -161,23 +246,28 @@ public class GMTKGame extends ApplicationAdapter {
     }
 
 	private void movePlayer() {
-        player.accelerateX(leftXAxisValue);
-        player.accelerateY(leftYAxisValue);
-        player.moveX(walls);
-        player.moveY(walls);
+		if (player.isChargingThrow() || player.isThrowing()) {
+			player.stopMoving();
+		}
+		else {
+			player.accelerateX(leftXAxisValue);
+			player.accelerateY(leftYAxisValue);
+			player.moveX(walls);
+			player.moveY(walls);
+		}
     }
 
     private void moveSpears() {
         for (Spear s : spears) {
-            if (player.hasSpear(s) && chargingThrow) {
+            if (player.hasSpear(s) && player.isChargingThrow()) {
                 s.setRotation(rightStick.angle() + 180);
             }
             else {
-                if (throwing) {
+                if (player.isThrowing()) {
                     s.setSpeed(throwSpeed);
                     s.setWasThrown(true);
                     s.setRotation(s.getRotation());
-                    throwing = false;
+                    player.setThrowing(false);
                     throwSpeed = 50;
                 }
             }
@@ -185,10 +275,24 @@ public class GMTKGame extends ApplicationAdapter {
                 s.move(walls);
             }
             if (!s.getWasThrown() && player.hasSpear(s)) {
-                s.setPosition(
-                        (player.getX() ),
-                        (player.getY() + s.getHeight())
-                );
+            	// Make the spear move to where the player is
+				if (player.isChargingThrow()) {
+					s.setPosition(
+							(player.getX() - s.getWidth() / 3),
+							(player.getY() + s.getHeight() * 5 / 3)
+					);
+				}
+				else {
+					float widthPadding = (player.isMovingRight() ?
+							s.getWidth() / 3 :
+							- (s.getWidth() / 3)
+					);
+					s.setPosition(
+							(player.getX() + widthPadding),
+							(player.getY() + s.getHeight())
+					);
+					s.setRotation(player.isMovingRight() ? 180 : 0);
+				}
             }
             if (!s.getWasThrown() && !player.hasASpear()) {
                 if (s.getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
@@ -202,6 +306,7 @@ public class GMTKGame extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 		playerImage.dispose();
+		playerSheet.dispose();
 		spearImage.dispose();
 		wallImage.dispose();
 	}
