@@ -29,6 +29,9 @@ public class GameController implements ControllerListener {
     @Override
     public boolean buttonUp(Controller controller, int buttonCode) {
         Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
+        if (buttonCode == 0) {
+            game.resetSpear();
+        }
         return false;
     }
 
@@ -39,12 +42,18 @@ public class GameController implements ControllerListener {
             value = 0;
         }
         if (axisCode == 0) {
-            game.yAxisValue = value;
+            game.leftYAxisValue = value;
         }
         else if (axisCode == 1) {
-            game.xAxisValue = value;
+            game.leftXAxisValue = value;
         }
-
+        else if (axisCode == 3) {
+            game.rightXAxisValue = value;
+        }
+        else if (axisCode == 2) {
+            game.rightYAxisValue = value;
+        }
+        Gdx.app.log("CONTROLLER: ", "axis moved");
         return false;
     }
 
