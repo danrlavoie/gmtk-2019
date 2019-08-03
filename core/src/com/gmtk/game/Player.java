@@ -1,28 +1,22 @@
 package com.gmtk.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Player extends Rectangle {
-    private float x, y;
+public class Player extends Sprite {
     private float xSpeed, ySpeed;
     final private float MAX_SPEED = 30;
     final private float DECELERATE = 0.9f;
     private int width, height;
-    public Player() {
-        super();
-        this.x = 1600 / 2 - 64 / 2;
-        this.y = 900 / 2 - 64 / 2;
+    public Player(Texture texture) {
+        super(texture);
+        this.setX(1600 / 2 - 64 / 2);
+        this.setY(900 / 2 - 64 / 2);
         this.xSpeed = 0;
         this.ySpeed = 0;
         this.width = 64;
         this.height = 64;
-    }
-    public float getX() {
-        return x;
-    }
-    public float getY() {
-        return y;
     }
     public void accelerateX(float value) {
         if (
@@ -58,15 +52,15 @@ public class Player extends Rectangle {
         if (this.ySpeed < -MAX_SPEED) this.ySpeed = -MAX_SPEED;
     }
     public void moveX() {
-        this.x += 14 * (this.xSpeed * Gdx.graphics.getDeltaTime());
-        if (this.x < 0) this.x = 0;
-        if (this.x > ( GMTKGame.CANVAS_WIDTH - this.width))
-            this.x = (GMTKGame.CANVAS_WIDTH - this.width);
+        this.setX(this.getX() + 14 * (this.xSpeed * Gdx.graphics.getDeltaTime()));
+        if (this.getX() < 0) this.setX(0);
+        if (this.getX() > ( GMTKGame.CANVAS_WIDTH - this.width))
+            this.setX(GMTKGame.CANVAS_WIDTH - this.width);
     }
     public void moveY() {
-        this.y += 14 * (this.ySpeed * Gdx.graphics.getDeltaTime());
-        if (this.y < 0) this.y = 0;
-        if (this.y > ( GMTKGame.CANVAS_HEIGHT - this.height))
-            this.y = ( GMTKGame.CANVAS_HEIGHT - this.height);
+        this.setY(this.getY() + 14 * (this.ySpeed * Gdx.graphics.getDeltaTime()));
+        if (this.getY() < 0) this.setY(0);
+        if (this.getY() > ( GMTKGame.CANVAS_HEIGHT - this.height))
+            this.setY( GMTKGame.CANVAS_HEIGHT - this.height);
     }
 }

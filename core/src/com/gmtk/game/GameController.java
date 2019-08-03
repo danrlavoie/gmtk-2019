@@ -53,7 +53,7 @@ public class GameController implements ControllerListener {
         else if (axisCode == 2) {
             game.rightYAxisValue = value;
         }
-        Gdx.app.log("CONTROLLER: ", "axis moved");
+//        Gdx.app.log("CONTROLLER: ", "axis moved");
         return false;
     }
 

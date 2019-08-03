@@ -8,6 +8,7 @@ import com.badlogic.gdx.controllers.mappings.Xbox;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -24,6 +25,7 @@ public class GMTKGame extends ApplicationAdapter {
 	GameController gameController;
 
 	private Array<Spear> spears;
+	private Array<Sprite> walls;
 
 	final public static int CANVAS_WIDTH = 1600;
 	final public static int CANVAS_HEIGHT = 900;
@@ -48,7 +50,7 @@ public class GMTKGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, CANVAS_WIDTH, CANVAS_HEIGHT);
-		createPlayer();
+		player = new Player(playerImage);
 
 		gameController = new GameController(this);
 		Gdx.app.log("CONTROLLERS", Controllers.getControllers().toString());
@@ -65,16 +67,36 @@ public class GMTKGame extends ApplicationAdapter {
 		throwing = false;
 		spears = new Array<Spear>();
 		spawnSpear();
-	}
 
-	private void createPlayer() {
-		player = new Player();
+		walls = new Array<Sprite>();
+		spawnWalls();
 	}
 
 	private void spawnSpear() {
 	    Spear spear = new Spear(spearImage);
 	    spears.add(spear);
     }
+
+    private void spawnWalls() {
+		int[][] coordinates = {
+				{300, -64},
+				{876, 400},
+				{-276, 400},
+				{300, 844},
+		};
+		int[] rotation = {
+				0,
+				90,
+				270,
+				180,
+		};
+		for (int i = 0; i < coordinates.length; i++ ) {
+			Sprite wall = new Sprite(wallImage);
+			wall.setRotation(rotation[i]);
+			wall.setPosition(coordinates[i][0], coordinates[i][1]);
+			walls.add(wall);
+		}
+	}
 
     public void resetSpear() {
 	    for (Spear s : spears) {
@@ -99,6 +121,9 @@ public class GMTKGame extends ApplicationAdapter {
 		for (Spear s : spears) {
 		    s.draw(batch);
         }
+		for (Sprite w : walls) {
+			w.draw(batch);
+		}
 		batch.end();
 
 		player.accelerateX(leftXAxisValue);
@@ -147,6 +172,12 @@ public class GMTKGame extends ApplicationAdapter {
             }
 //		    Gdx.app.log("SPEAR ANGLE: ", Float.toString(s.getRotation()));
         }
+
+		for (Sprite w : walls) {
+			if (player.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
+				Gdx.app.log("COLLISION: ", "wall");
+			}
+		}
 //		Gdx.app.log("THROW SPEED: ", Float.toString(throwSpeed));
 	}
 	
