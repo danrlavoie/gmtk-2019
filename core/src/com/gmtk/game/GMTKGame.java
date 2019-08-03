@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -89,8 +90,15 @@ public class GMTKGame extends ApplicationAdapter {
 	}
 
 	private void spawnEnemy() {
-	    Enemy e = new Enemy();
-
+	    // playerImage is a placeholder for a 64x64 sprite
+	    Enemy e = new Enemy(renderer.playerImage, ActorClass.ENEMY, null);
+        float x = player.getX();
+        float y = player.getY();
+        while (Vector2.dst(x, y, player.getX(), player.getY()) < 200) {
+            x = MathUtils.random(0, 1600);
+            y = MathUtils.random(0, 900);
+        }
+        e.setPosition(x, y);
     }
 
     public void resetSpear() {

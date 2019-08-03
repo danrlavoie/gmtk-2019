@@ -11,6 +11,9 @@ public class Player extends Sprite {
     final private float DECELERATE = 0.9f;
     private int width, height;
     private Spear spear;
+    private ActorState currentState;
+    private boolean chargingThrow;
+    private boolean throwing;
 
     public boolean isChargingThrow() {
         return chargingThrow;
@@ -28,18 +31,12 @@ public class Player extends Sprite {
         this.throwing = throwing;
     }
 
-    private boolean chargingThrow;
-    private boolean throwing;
 
-    public enum PlayerState {
-        IDLE,WALKING,THROWING,HURT,DYING;
-    }
-
-    public PlayerState getCurrentState() {
+    public ActorState getCurrentState() {
         return currentState;
     }
 
-    public void setCurrentState(PlayerState currentState) {
+    public void setCurrentState(ActorState currentState) {
         this.currentState = currentState;
     }
 
@@ -56,7 +53,6 @@ public class Player extends Sprite {
         this.ySpeed = 0;
     }
 
-    private PlayerState currentState;
 
     public Player(Texture texture, Spear spear) {
         super(texture);
@@ -67,7 +63,7 @@ public class Player extends Sprite {
         this.width = 64;
         this.height = 64;
         this.spear = spear;
-        this.currentState = PlayerState.IDLE;
+        this.currentState = ActorState.IDLE;
         this.chargingThrow = false;
         this.throwing = false;
     }

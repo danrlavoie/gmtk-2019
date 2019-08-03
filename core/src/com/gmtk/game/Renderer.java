@@ -16,12 +16,22 @@ public class Renderer {
 
     float animationTime;
 
-    Animation<TextureRegion> idleAnimation;
-    Animation<TextureRegion> walkAnimation;
-    Animation<TextureRegion> throwAnimation;
-    Animation<TextureRegion> hurtAnimation;
-    Animation<TextureRegion> dieAnimation;
+    Animation<TextureRegion> idleAnimationP;
+    Animation<TextureRegion> walkAnimationP;
+    Animation<TextureRegion> throwAnimationP;
+    Animation<TextureRegion> hurtAnimationP;
+    Animation<TextureRegion> dieAnimationP;
     Animation<TextureRegion> currentAnimation;
+    Animation<TextureRegion> idleAnimationE;
+    Animation<TextureRegion> walkAnimationE;
+    Animation<TextureRegion> throwAnimationE;
+    Animation<TextureRegion> hurtAnimationE;
+    Animation<TextureRegion> dieAnimationE;
+    Animation<TextureRegion> idleAnimationS;
+    Animation<TextureRegion> walkAnimationS;
+    Animation<TextureRegion> throwAnimationS;
+    Animation<TextureRegion> hurtAnimationS;
+    Animation<TextureRegion> dieAnimationS;
     Texture playerSheet;
     Texture enemySheet;
     Texture spearEnemySheet;
@@ -36,34 +46,66 @@ public class Renderer {
         spearEnemySheet = new Texture(Gdx.files.internal("spear-gladiator.png"));
 
 
-        TextureRegion[][] tmp = TextureRegion.split(playerSheet, 64, 64);
-        TextureRegion[] idleFrames = new TextureRegion[5];
+        TextureRegion[][] player = TextureRegion.split(playerSheet, 64, 64);
+        TextureRegion[][] enemy = TextureRegion.split(enemySheet, 64, 64);
+        TextureRegion[][] spearEnemy = TextureRegion.split(spearEnemySheet, 64, 64);
+        TextureRegion[] idleFramesP = new TextureRegion[5];
+        TextureRegion[] idleFramesE = new TextureRegion[5];
+        TextureRegion[] idleFramesS = new TextureRegion[5];
         for (int i = 0; i < 5; i++) {
-            idleFrames[i] = tmp[0][i];
+            idleFramesP[i] = player[0][i];
+            idleFramesE[i] = enemy[0][i];
+            idleFramesS[i] = spearEnemy[0][i];
         }
-        TextureRegion[] walkFrames = new TextureRegion[8];
+        TextureRegion[] walkFramesP = new TextureRegion[8];
+        TextureRegion[] walkFramesE = new TextureRegion[8];
+        TextureRegion[] walkFramesS = new TextureRegion[8];
         for (int i = 0; i < 8; i++) {
-            walkFrames[i] = tmp[1][i];
+            walkFramesP[i] = player[1][i];
+            walkFramesE[i] = enemy[1][i];
+            walkFramesS[i] = spearEnemy[1][i];
         }
-        TextureRegion[] throwFrames = new TextureRegion[7];
+        TextureRegion[] throwFramesP = new TextureRegion[7];
+        TextureRegion[] throwFramesE = new TextureRegion[7];
+        TextureRegion[] throwFramesS = new TextureRegion[7];
         for (int i = 0; i < 7; i++) {
-            throwFrames[i] = tmp[2][i];
+            throwFramesP[i] = player[2][i];
+            throwFramesE[i] = enemy[2][i];
+            throwFramesS[i] = spearEnemy[2][i];
         }
-        TextureRegion[] hurtFrames = new TextureRegion[3];
+        TextureRegion[] hurtFramesP = new TextureRegion[3];
+        TextureRegion[] hurtFramesE = new TextureRegion[3];
+        TextureRegion[] hurtFramesS = new TextureRegion[3];
         for (int i = 0; i < 3; i++) {
-            hurtFrames[i] = tmp[3][i];
+            hurtFramesP[i] = player[3][i];
+            hurtFramesE[i] = enemy[3][i];
+            hurtFramesS[i] = spearEnemy[3][i];
         }
-        TextureRegion[] dieFrames = new TextureRegion[7];
+        TextureRegion[] dieFramesP = new TextureRegion[7];
+        TextureRegion[] dieFramesE = new TextureRegion[7];
+        TextureRegion[] dieFramesS = new TextureRegion[7];
         for (int i = 0; i < 7; i++) {
-            dieFrames[i] = tmp[4][i];
+            dieFramesP[i] = player[4][i];
+            dieFramesE[i] = enemy[4][i];
+            dieFramesS[i] = spearEnemy[4][i];
         }
 
-        idleAnimation = new Animation<TextureRegion>(0.1f, idleFrames);
-        walkAnimation = new Animation<TextureRegion>(0.1f, walkFrames);
-        throwAnimation = new Animation<TextureRegion>(0.1f, throwFrames);
-        hurtAnimation = new Animation<TextureRegion>(0.1f, hurtFrames);
-        dieAnimation = new Animation<TextureRegion>(0.1f, dieFrames);
-        currentAnimation = idleAnimation;
+        idleAnimationP = new Animation<TextureRegion>(0.1f, idleFramesP);
+        walkAnimationP = new Animation<TextureRegion>(0.1f, walkFramesP);
+        throwAnimationP = new Animation<TextureRegion>(0.1f, throwFramesP);
+        hurtAnimationP = new Animation<TextureRegion>(0.1f, hurtFramesP);
+        dieAnimationP = new Animation<TextureRegion>(0.1f, dieFramesP);
+        currentAnimation = idleAnimationP;
+        idleAnimationE = new Animation<TextureRegion>(0.1f, idleFramesE);
+        walkAnimationE = new Animation<TextureRegion>(0.1f, walkFramesE);
+        throwAnimationE = new Animation<TextureRegion>(0.1f, throwFramesE);
+        hurtAnimationP = new Animation<TextureRegion>(0.1f, hurtFramesE);
+        dieAnimationE = new Animation<TextureRegion>(0.1f, dieFramesE);
+        idleAnimationS = new Animation<TextureRegion>(0.1f, idleFramesS);
+        walkAnimationS = new Animation<TextureRegion>(0.1f, walkFramesS);
+        throwAnimationS = new Animation<TextureRegion>(0.1f, throwFramesS);
+        hurtAnimationS = new Animation<TextureRegion>(0.1f, hurtFramesS);
+        dieAnimationS = new Animation<TextureRegion>(0.1f, dieFramesS);
         animationTime = 0f;
     }
 
@@ -76,31 +118,31 @@ public class Renderer {
         if (
                 (player.isChargingThrow() || player.isThrowing())
         ) {
-            player.setCurrentState(Player.PlayerState.THROWING);
+            player.setCurrentState(ActorState.THROWING);
         }
         else if (
                 player.isMoving()
         ) {
-            player.setCurrentState(Player.PlayerState.WALKING);
+            player.setCurrentState(ActorState.WALKING);
         }
         else {
-            player.setCurrentState(Player.PlayerState.IDLE);
+            player.setCurrentState(ActorState.IDLE);
         }
         switch(player.getCurrentState()) {
             case WALKING:
-                currentAnimation = walkAnimation;
+                currentAnimation = walkAnimationP;
                 break;
             case HURT:
-                currentAnimation = hurtAnimation;
+                currentAnimation = hurtAnimationP;
                 break;
             case DYING:
-                currentAnimation = dieAnimation;
+                currentAnimation = dieAnimationP;
                 break;
             case THROWING:
-                currentAnimation = throwAnimation;
+                currentAnimation = throwAnimationP;
                 break;
             default:
-                currentAnimation = idleAnimation;
+                currentAnimation = idleAnimationP;
         }
         TextureRegion currentFrame;
         if (player.isChargingThrow()) {
