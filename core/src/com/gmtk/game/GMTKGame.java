@@ -160,11 +160,12 @@ public class GMTKGame extends ApplicationAdapter {
             }
 		    else {
 		        if (throwing) {
+		        	Gdx.app.log("THROWING: ", Float.toString(throwSpeed));
 		            s.setSpeed(throwSpeed);
 		            s.setWasThrown(true);
 		            s.setRotation(s.getRotation());
 		            throwing = false;
-		            throwSpeed = 0;
+		            throwSpeed = 50;
                 }
             }
 		    if (s.getWasThrown()) {

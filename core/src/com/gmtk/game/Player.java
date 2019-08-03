@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class Player extends Sprite {
     private float xSpeed, ySpeed;
-    final private float MAX_SPEED = 30;
+    final private float MAX_SPEED = 20;
     final private float DECELERATE = 0.9f;
     private int width, height;
     private Spear spear;
@@ -70,7 +70,7 @@ public class Player extends Sprite {
     }
     public void moveX(Array<Sprite> walls) {
         float oldX = this.getX();
-        float newX = this.getX() + 14 * (this.xSpeed * Gdx.graphics.getDeltaTime());
+        float newX = this.getX() + 12 * (this.xSpeed * Gdx.graphics.getDeltaTime());
         if (newX < 0) newX = 0;
         if (newX > ( GMTKGame.CANVAS_WIDTH - this.width))
             newX = (GMTKGame.CANVAS_WIDTH - this.width);
@@ -84,7 +84,7 @@ public class Player extends Sprite {
     }
     public void moveY(Array<Sprite> walls) {
         float oldY = this.getY();
-        float newY = this.getY() + 14 * (this.ySpeed * Gdx.graphics.getDeltaTime());
+        float newY = this.getY() + 12 * (this.ySpeed * Gdx.graphics.getDeltaTime());
         if (newY < 0) newY = 0;
         if (newY > ( GMTKGame.CANVAS_HEIGHT - this.height))
             newY = ( GMTKGame.CANVAS_HEIGHT - this.height);
