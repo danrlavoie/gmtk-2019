@@ -112,81 +112,91 @@ public class GMTKGame extends ApplicationAdapter {
 	public void render () {
 		Gdx.gl.glClearColor(0.8f, 0.8f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		camera.update();
 
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		for (Sprite w : walls) {
-			w.draw(batch);
-		}
-		batch.draw(playerImage, player.getX(), player.getY());
+        drawSprites();
 
-		for (Spear s : spears) {
-		    s.draw(batch);
+		handleThrowMechanics();
+        movePlayer();
+        moveSpears();
+	}
+
+	private void drawSprites() {
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        for (Sprite w : walls) {
+            w.draw(batch);
         }
-		batch.end();
+        batch.draw(playerImage, player.getX(), player.getY());
 
-		rightStick.x = rightXAxisValue;
-		rightStick.y = -rightYAxisValue;
+        for (Spear s : spears) {
+            s.draw(batch);
+        }
+        batch.end();
+    }
 
-		if (player.hasASpear()) {
-			if (!chargingThrow) {
-				if (!(rightStick.x == 0 && rightStick.y == 0)) {
-					chargingThrow = true;
-				}
-			} else {
-				if (!(rightStick.x == 0 && rightStick.y == 0)) {
-					throwSpeed += 500 * Gdx.graphics.getDeltaTime();
-					if (throwSpeed > MAX_THROW_SPEED) {
-						throwSpeed = MAX_THROW_SPEED;
-					}
-				} else {
-					throwing = true;
-					chargingThrow = false;
-					player.setSpear(null);
-				}
-			}
-		}
+	private void handleThrowMechanics() {
+        rightStick.x = rightXAxisValue;
+        rightStick.y = -rightYAxisValue;
 
-		player.accelerateX(leftXAxisValue);
-		player.accelerateY(leftYAxisValue);
-		player.moveX(walls);
-		player.moveY(walls);
-
-		for (Spear s : spears) {
-		    if (player.hasSpear(s) && chargingThrow) {
-                s.setRotation(rightStick.angle() + 180);
-            }
-		    else {
-		        if (throwing) {
-		        	Gdx.app.log("THROWING: ", Float.toString(throwSpeed));
-		            s.setSpeed(throwSpeed);
-		            s.setWasThrown(true);
-		            s.setRotation(s.getRotation());
-		            throwing = false;
-		            throwSpeed = 50;
+        if (player.hasASpear()) {
+            if (!chargingThrow) {
+                if (!(rightStick.x == 0 && rightStick.y == 0)) {
+                    chargingThrow = true;
+                }
+            } else {
+                if (!(rightStick.x == 0 && rightStick.y == 0)) {
+                    throwSpeed += 500 * Gdx.graphics.getDeltaTime();
+                    if (throwSpeed > MAX_THROW_SPEED) {
+                        throwSpeed = MAX_THROW_SPEED;
+                    }
+                } else {
+                    throwing = true;
+                    chargingThrow = false;
+                    player.setSpear(null);
                 }
             }
-		    if (s.getWasThrown()) {
-		        s.move(walls);
-            }
-		    if (!s.getWasThrown() && player.hasSpear(s)) {
-                s.setPosition(
-                	(player.getX() ),
-					(player.getY() + s.getHeight())
-				);
-            }
-		    if (!s.getWasThrown() && !player.hasASpear()) {
-		    	if (s.getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
-		    		player.setSpear(s);
-				}
-			}
-//		    Gdx.app.log("SPEAR ANGLE: ", Float.toString(s.getRotation()));
         }
 
-//		Gdx.app.log("THROW SPEED: ", Float.toString(throwSpeed));
-	}
+    }
+
+	private void movePlayer() {
+        player.accelerateX(leftXAxisValue);
+        player.accelerateY(leftYAxisValue);
+        player.moveX(walls);
+        player.moveY(walls);
+    }
+
+    private void moveSpears() {
+        for (Spear s : spears) {
+            if (player.hasSpear(s) && chargingThrow) {
+                s.setRotation(rightStick.angle() + 180);
+            }
+            else {
+                if (throwing) {
+                    s.setSpeed(throwSpeed);
+                    s.setWasThrown(true);
+                    s.setRotation(s.getRotation());
+                    throwing = false;
+                    throwSpeed = 50;
+                }
+            }
+            if (s.getWasThrown()) {
+                s.move(walls);
+            }
+            if (!s.getWasThrown() && player.hasSpear(s)) {
+                s.setPosition(
+                        (player.getX() ),
+                        (player.getY() + s.getHeight())
+                );
+            }
+            if (!s.getWasThrown() && !player.hasASpear()) {
+                if (s.getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
+                    player.setSpear(s);
+                }
+            }
+        }
+    }
 	
 	@Override
 	public void dispose () {
