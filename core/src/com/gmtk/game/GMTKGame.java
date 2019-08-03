@@ -10,14 +10,18 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 public class GMTKGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
 	Texture playerImage;
+	Texture spearImage;
 	Player player;
 	OrthographicCamera camera;
 	GameController gameController;
+
+	private Array<Spear> spears;
 
 	final public static int CANVAS_WIDTH = 1600;
 	final public static int CANVAS_HEIGHT = 900;
@@ -28,8 +32,8 @@ public class GMTKGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		playerImage = new Texture(Gdx.files.internal("bucket.png"));
+		spearImage = new Texture(Gdx.files.internal("spear.png"));
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, CANVAS_WIDTH, CANVAS_HEIGHT);
 		createPlayer();
@@ -39,11 +43,19 @@ public class GMTKGame extends ApplicationAdapter {
 		Controllers.addListener(gameController);
 		xAxisValue = 0;
 		yAxisValue = 0;
+
+		spears = new Array<Spear>();
+		spawnSpear();
 	}
 
 	private void createPlayer() {
 		player = new Player();
 	}
+
+	private void spawnSpear() {
+	    Spear spear = new Spear(spearImage);
+	    spears.add(spear);
+    }
 
 	@Override
 	public void render () {
@@ -55,6 +67,10 @@ public class GMTKGame extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		batch.draw(playerImage, player.getX(), player.getY());
+
+		for (Spear s : spears) {
+		    s.draw(batch);
+        }
 		batch.end();
 
 		player.accelerateX(xAxisValue);
