@@ -26,6 +26,7 @@ public class GMTKGame extends ApplicationAdapter {
 	private Array<Spear> spears;
 	private Array<Sprite> walls;
 	private Array<Enemy> enemies;
+	private static int enemyCount = 0;
 
 	final public static int CANVAS_WIDTH = 1600;
 	final public static int CANVAS_HEIGHT = 900;
@@ -95,12 +96,13 @@ public class GMTKGame extends ApplicationAdapter {
 
 	public void spawnEnemy() {
 	    // playerImage is a placeholder for a 64x64 sprite
-	    Enemy e = new Enemy(renderer.playerImage, ActorClass.ENEMY, null);
+		enemyCount++;
+	    Enemy e = new Enemy(renderer.playerImage, ActorClass.ENEMY, null, enemyCount);
         float x = player.getX();
         float y = player.getY();
         while (Vector2.dst(x, y, player.getX(), player.getY()) < 200) {
             x = MathUtils.random(300, 1250);
-            y = MathUtils.random(64, 800);
+            y = MathUtils.random(64, 780);
         }
         e.setPosition(x, y);
         enemies.add(e);
@@ -215,7 +217,25 @@ public class GMTKGame extends ApplicationAdapter {
     }
 
     private void moveEnemies() {
+//		Gdx.app.log("ENEMIES: ",enemies.toString());
+		for (int i = 0; i < enemies.size; i++) {
+			Enemy e = enemies.get(i);
+			Gdx.app.log(Integer.toString(e.getId()), "Movan");
 
+			Vector2 eToPlayer = new Vector2(
+					player.getX() - e.getX(), player.getY() - e.getY()
+			);
+			float distanceToPlayer = eToPlayer.len();
+			if (distanceToPlayer > e.getWidth()) {
+				//Gdx.app.log(Integer.toString(e.getId()), "DISTANCE > width");
+				float xAxisValue = (float)Math.cos(eToPlayer.angleRad());
+				float yAxisValue = -(float)Math.sin(eToPlayer.angleRad());
+				e.accelerateX(xAxisValue);
+				e.accelerateY(yAxisValue);
+				e.moveX(walls, enemies);
+				e.moveY(walls, enemies);
+			}
+		}
     }
 	
 	@Override
