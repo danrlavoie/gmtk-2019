@@ -13,6 +13,10 @@ public class Enemy extends Sprite {
     private int width, height;
     private Spear spear;
     private ActorState currentState;
+    private int health;
+
+    private boolean dying;
+    private boolean dead;
 
 
     private ActorClass currentClass;
@@ -32,7 +36,15 @@ public class Enemy extends Sprite {
         this.currentClass = classification;
         this.chargingThrow = false;
         this.throwing = false;
+        this.dying = false;
+        this.dead = false;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof Enemy && ((Enemy)obj).getId() == this.id);
+    }
+
     public ActorClass getCurrentClass() {
         return currentClass;
     }
@@ -53,6 +65,13 @@ public class Enemy extends Sprite {
         this.throwing = throwing;
     }
 
+    public boolean isDying() { return dying; }
+
+    public void setDying(boolean dying) { this.dying = dying; }
+
+    public boolean isDead() { return dead; }
+
+    public void setDead(boolean dead) { this.dead = dead; }
 
     public ActorState getCurrentState() {
         return currentState;
@@ -158,5 +177,11 @@ public class Enemy extends Sprite {
                 break;
             }
         }
+    }
+    public void hurt() {
+        this.health -= 1;
+    }
+    public int getHealth() {
+        return this.health;
     }
 }

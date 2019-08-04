@@ -59,13 +59,13 @@ public class GameScreen implements Screen {
         spawnWalls();
 
         enemies = new Array<Enemy>();
-        spawnEnemy();
     }
 
     @Override
     public void show() {
         // stuff that happens
         // when the screen is shown
+        spawnEnemy();
     }
 
     @Override
@@ -147,8 +147,13 @@ public class GameScreen implements Screen {
         moveSpears();
         moveEnemies();
 
-        if (player.getHealth() <= 0) {
+        if (player.isDead()) {
             game.setScreen(new GameOver(game));
+        }
+        for (Enemy e : enemies) {
+            if (e.isDead()) {
+                enemies.removeValue(e, false);
+            }
         }
     }
 
@@ -206,7 +211,16 @@ public class GameScreen implements Screen {
                 }
             }
             if (s.getWasThrown()) {
-                s.move(walls);
+                if (s.isMoving()) {
+                    s.move(walls);
+                    for (Enemy e: enemies) {
+                        if (e.getBoundingRectangle().overlaps(s.getBoundingRectangle())) {
+                            e.hurt();
+                            e.setCurrentState(ActorState.HURT);
+                            s.setSpeed(s.getSpeed() / 4);
+                        }
+                    }
+                }
             }
             if (!s.getWasThrown() && player.hasSpear(s)) {
                 // Make the spear move to where the player is
@@ -240,7 +254,6 @@ public class GameScreen implements Screen {
 //		Gdx.app.log("ENEMIES: ",enemies.toString());
         for (int i = 0; i < enemies.size; i++) {
             Enemy e = enemies.get(i);
-
             Vector2 eToPlayer = new Vector2(
                     player.getX() - e.getX(), player.getY() - e.getY()
             );

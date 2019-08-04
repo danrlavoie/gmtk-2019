@@ -100,7 +100,7 @@ public class Renderer {
         idleAnimationE = new Animation<TextureRegion>(0.1f, idleFramesE);
         walkAnimationE = new Animation<TextureRegion>(0.1f, walkFramesE);
         throwAnimationE = new Animation<TextureRegion>(0.1f, throwFramesE);
-        hurtAnimationP = new Animation<TextureRegion>(0.1f, hurtFramesE);
+        hurtAnimationE = new Animation<TextureRegion>(0.1f, hurtFramesE);
         dieAnimationE = new Animation<TextureRegion>(0.1f, dieFramesE);
         idleAnimationS = new Animation<TextureRegion>(0.1f, idleFramesS);
         walkAnimationS = new Animation<TextureRegion>(0.1f, walkFramesS);
@@ -144,14 +144,19 @@ public class Renderer {
     public void drawEnemy(Enemy e, Player p) {
         Animation<TextureRegion> currentAnimation;
 
-        if (e.isChargingThrow() || e.isThrowing()) {
-            e.setCurrentState(ActorState.THROWING);
-        }
-        else if (e.isMoving()) {
-            e.setCurrentState(ActorState.WALKING);
-        }
-        else {
-            e.setCurrentState(ActorState.IDLE);
+        if(!(e.getCurrentState() == ActorState.HURT)) {
+            if (e.isChargingThrow() || e.isThrowing()) {
+                e.setCurrentState(ActorState.THROWING);
+            } else if (e.isMoving()) {
+                e.setCurrentState(ActorState.WALKING);
+            } else {
+                e.setCurrentState(ActorState.IDLE);
+            }
+        } else {
+            if (e.getHealth() <= 0) {
+                e.setDying(true);
+                e.setCurrentState(ActorState.DYING);
+            }
         }
         if (e.getCurrentClass() == ActorClass.ENEMY) {
             switch(e.getCurrentState()) {
@@ -204,7 +209,12 @@ public class Renderer {
                 e.setThrowing(false);
                 if(e.getBoundingRectangle().overlaps(p.getBoundingRectangle())) {
                     p.hurt();
+                    p.setCurrentState(ActorState.HURT);
                 }
+            }
+            if(e.isDying()) {
+                e.setDead(true);
+                e.setDying(false);
             }
         }
         boolean flip = (e.isMovingRight());
@@ -220,14 +230,20 @@ public class Renderer {
     public void drawPlayer(Player player) {
         Animation<TextureRegion> currentAnimation;
 
-        if ((player.isChargingThrow() || player.isThrowing())) {
-            player.setCurrentState(ActorState.THROWING);
-        }
-        else if (player.isMoving()) {
-            player.setCurrentState(ActorState.WALKING);
-        }
-        else {
-            player.setCurrentState(ActorState.IDLE);
+        if(!(player.getCurrentState() == ActorState.HURT ||
+                player.getCurrentState() == ActorState.DYING)) {
+            if ((player.isChargingThrow() || player.isThrowing())) {
+                player.setCurrentState(ActorState.THROWING);
+            } else if (player.isMoving()) {
+                player.setCurrentState(ActorState.WALKING);
+            } else {
+                player.setCurrentState(ActorState.IDLE);
+            }
+        } else {
+            if (player.getHealth() <= 0) {
+                player.setDying(true);
+                player.setCurrentState(ActorState.DYING);
+            }
         }
         switch(player.getCurrentState()) {
             case WALKING:
@@ -256,6 +272,13 @@ public class Renderer {
         }
         if (currentAnimation.isAnimationFinished(animationTimeP)) {
             animationTimeP = 0f;
+            if (player.getCurrentState() == ActorState.HURT) {
+                player.setCurrentState(ActorState.IDLE);
+            }
+            if(player.isDying()) {
+                player.setDead(true);
+                player.setDying(false);
+            }
         }
         boolean flip = (player.isMovingRight());
         batch.draw(

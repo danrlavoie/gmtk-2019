@@ -24,6 +24,11 @@ public class Spear extends Sprite {
     }
 
     private boolean wasThrown;
+
+    public boolean isMoving() {
+        return this.speed > 0;
+    }
+
     public Spear(Texture texture) {
         super(texture);
         this.setX(1600 / 2 - 64 / 2);
@@ -38,34 +43,33 @@ public class Spear extends Sprite {
     public void setSpeed(float value) {
         this.speed = value;
     }
+    public float getSpeed() { return this.speed; }
     public void move(Array<Sprite> walls) {
-        if (this.speed > 0) {
-            this.timeInFlight += Gdx.graphics.getDeltaTime();
-            if (this.timeInFlight > 1.5) {
+        this.timeInFlight += Gdx.graphics.getDeltaTime();
+        if (this.timeInFlight > 1.5) {
+            this.setSpeed(0);
+            this.wasThrown = false;
+            this.timeInFlight = 0;
+        }
+        float oldX = this.getX();
+        float oldY = this.getY();
+        float deltaX = (float)(
+                this.speed *
+                        Gdx.graphics.getDeltaTime() *
+                        Math.cos(Math.toRadians(this.getRotation()))
+        );
+        float deltaY = (float)(
+                this.speed *
+                        Gdx.graphics.getDeltaTime() *
+                        Math.sin(Math.toRadians(this.getRotation()))
+        );
+        this.translate(deltaX, deltaY);
+        for (Sprite w : walls) {
+            if (this.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
+                this.setPosition(oldX + (3 * deltaX), oldY + (3 *deltaY));
                 this.setSpeed(0);
                 this.wasThrown = false;
                 this.timeInFlight = 0;
-            }
-            float oldX = this.getX();
-            float oldY = this.getY();
-            float deltaX = (float)(
-                    this.speed *
-                            Gdx.graphics.getDeltaTime() *
-                            Math.cos(Math.toRadians(this.getRotation()))
-            );
-            float deltaY = (float)(
-                    this.speed *
-                            Gdx.graphics.getDeltaTime() *
-                            Math.sin(Math.toRadians(this.getRotation()))
-            );
-            this.translate(deltaX, deltaY);
-            for (Sprite w : walls) {
-                if (this.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
-                    this.setPosition(oldX + (3 * deltaX), oldY + (3 *deltaY));
-                    this.setSpeed(0);
-                    this.wasThrown = false;
-                    this.timeInFlight = 0;
-                }
             }
         }
 

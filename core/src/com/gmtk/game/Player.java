@@ -15,6 +15,9 @@ public class Player extends Sprite {
     private boolean chargingThrow;
     private boolean throwing;
     private int health;
+    private boolean dying;
+    private boolean dead;
+    final public static ActorClass actorClass = ActorClass.PLAYER;
 
     public boolean isChargingThrow() {
         return chargingThrow;
@@ -75,7 +78,17 @@ public class Player extends Sprite {
         this.chargingThrow = false;
         this.throwing = false;
         this.health = 3;
+        this.dying = false;
+        this.dead = false;
     }
+
+    public boolean isDying() { return this.dying; }
+
+    public void setDying(boolean dying) { this.dying = dying; }
+
+    public boolean isDead() { return this.dead; }
+
+    public void setDead(boolean dead) { this.dead = dead; }
 
     public void setSpear(Spear s) {
         this.spear = s;
