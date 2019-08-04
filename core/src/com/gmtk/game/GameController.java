@@ -6,8 +6,8 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
 
 public class GameController implements ControllerListener {
-    private GMTKGame game;
-    public GameController(GMTKGame game) {
+    private GameScreen game;
+    public GameController(GameScreen game) {
         super();
         this.game = game;
     }

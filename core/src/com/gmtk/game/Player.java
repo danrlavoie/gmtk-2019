@@ -127,8 +127,8 @@ public class Player extends Sprite {
         float oldX = this.getX();
         float newX = this.getX() + 12 * (this.xSpeed * Gdx.graphics.getDeltaTime());
         if (newX < 0) newX = 0;
-        if (newX > ( GMTKGame.CANVAS_WIDTH - this.width))
-            newX = (GMTKGame.CANVAS_WIDTH - this.width);
+        if (newX > ( GameScreen.CANVAS_WIDTH - this.width))
+            newX = (GameScreen.CANVAS_WIDTH - this.width);
         this.setX(newX);
         for (Sprite w : walls) {
             if (this.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
@@ -141,8 +141,8 @@ public class Player extends Sprite {
         float oldY = this.getY();
         float newY = this.getY() + 12 * (this.ySpeed * Gdx.graphics.getDeltaTime());
         if (newY < 0) newY = 0;
-        if (newY > ( GMTKGame.CANVAS_HEIGHT - this.height))
-            newY = ( GMTKGame.CANVAS_HEIGHT - this.height);
+        if (newY > ( GameScreen.CANVAS_HEIGHT - this.height))
+            newY = ( GameScreen.CANVAS_HEIGHT - this.height);
         this.setY(newY);
         for (Sprite w : walls) {
             if (this.getBoundingRectangle().overlaps(w.getBoundingRectangle())) {
