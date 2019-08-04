@@ -3,6 +3,7 @@ package com.gmtk.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class Renderer {
@@ -214,8 +215,14 @@ public class Renderer {
             animationTimeES = 0f;
             if(e.isThrowing()) {
                 e.setThrowing(false);
-                if(e.getBoundingRectangle().overlaps(p.getBoundingRectangle())) {
+                Vector2 eToPlayer = new Vector2(
+                        p.getX() - e.getX(), p.getY() - e.getY()
+                );
+                float distanceToPlayer = eToPlayer.len();
+                if(distanceToPlayer < e.getWidth() * 2) {
                     p.hurt();
+                    GameScreen.playHurtSound();
+                    GameScreen.playReactionSound();
                     p.setCurrentState(ActorState.HURT);
                 }
             }

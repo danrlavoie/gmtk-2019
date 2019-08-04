@@ -2,6 +2,8 @@ package com.gmtk.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -17,11 +19,26 @@ public class GameScreen implements Screen {
     Player player;
     GameController gameController;
 
+    private Sound reactOne;
+    private Sound reactTwo;
+    private Sound reactThree;
+    private static Sound[] reactions;
+    private Music crowdNoise;
+
+    private static Sound spearWall;
+
+    private static Sound spearEnemy;
+
+    private Sound hurtOne;
+    private Sound hurtTwo;
+    private Sound hurtThree;
+    private static Sound[] hurtSounds;
     private Array<Spear> spears;
     private Array<Sprite> walls;
     private Array<Enemy> enemies;
     private static int enemyCount = 0;
     public static int score = 0;
+    private static int spearCount = 0;
 
     final public static int CANVAS_WIDTH = 1600;
     final public static int CANVAS_HEIGHT = 900;
@@ -46,6 +63,19 @@ public class GameScreen implements Screen {
         this.game = game;
         renderer = new Renderer();
 
+        crowdNoise = Gdx.audio.newMusic(Gdx.files.internal("crowd-noise.mp3"));
+        reactOne = Gdx.audio.newSound(Gdx.files.internal("react1.wav"));
+        reactTwo = Gdx.audio.newSound(Gdx.files.internal("react2.wav"));
+        reactThree = Gdx.audio.newSound(Gdx.files.internal("react3.wav"));
+        reactions = new Sound[]{ reactOne, reactTwo, reactThree };
+
+        hurtOne = Gdx.audio.newSound(Gdx.files.internal("hurt1.wav"));
+        hurtTwo = Gdx.audio.newSound(Gdx.files.internal("hurt2.wav"));
+        hurtThree = Gdx.audio.newSound(Gdx.files.internal("hurt3.wav"));
+        hurtSounds = new Sound[]{ hurtOne, hurtTwo, hurtThree };
+
+        spearWall = Gdx.audio.newSound(Gdx.files.internal("spear-wall.wav"));
+        spearEnemy = Gdx.audio.newSound(Gdx.files.internal("spear-armor.wav"));
 
         gameController = new GameController(this);
         Gdx.app.log("CONTROLLERS", Controllers.getControllers().toString());
@@ -64,9 +94,13 @@ public class GameScreen implements Screen {
         rounds.add(new char[]{'E', 'E'});
         rounds.add(new char[]{'E', 'E', 'E'});
         rounds.add(new char[]{'E', 'E', 'E', 'S'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'S'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
 
         spears = new Array<Spear>();
-        spawnSpear(800, 450);
+        spawnSpear(800, 450, spearCount++);
         player = new Player(renderer.playerImage, null);
 
         walls = new Array<Sprite>();
@@ -87,6 +121,8 @@ public class GameScreen implements Screen {
             spawnEnemy(c[i]);
         }
         roundStartTime = TimeUtils.nanoTime();
+        crowdNoise.setLooping(true);
+        crowdNoise.play();
     }
 
     @Override
@@ -94,6 +130,7 @@ public class GameScreen implements Screen {
     }
     @Override
     public void hide() {
+        crowdNoise.stop();
     }
 
     @Override
@@ -104,9 +141,22 @@ public class GameScreen implements Screen {
     public void resume() {
     }
 
+    public static void playReactionSound() {
+        int i = MathUtils.random(2);
+        reactions[i].play();
+    }
 
-    private void spawnSpear(float x, float y) {
-        Spear spear = new Spear(renderer.spearImage, x, y);
+    public static void playHurtSound() {
+        int i = MathUtils.random(2);
+        hurtSounds[i].play();
+    }
+
+    public static void playSpearWallSound() {
+        spearWall.play();
+    }
+
+    private void spawnSpear(float x, float y, int id) {
+        Spear spear = new Spear(renderer.spearImage, x, y, id);
         spears.add(spear);
     }
 
@@ -143,13 +193,22 @@ public class GameScreen implements Screen {
             a = ActorClass.LION;
         }
         Enemy e = new Enemy(renderer.playerImage, a, null, enemyCount);
-        float x = player.getX();
-        float y = player.getY();
-        while (Vector2.dst(x, y, player.getX(), player.getY()) < 200) {
-            x = MathUtils.random(300, 1250);
-            y = MathUtils.random(64, 780);
+        boolean canPlace = false;
+        while (!canPlace) {
+            float x = MathUtils.random(300, 1250);
+            float y = MathUtils.random(64, 780);
+            e.setPosition(x, y);
+            boolean farEnough = (Vector2.dst(x, y, player.getX(), player.getY()) > 150);
+            boolean notOverlapping = true;
+            for (Enemy other : enemies) {
+                if (other.getBoundingRectangle().overlaps(e.getBoundingRectangle())) {
+                    notOverlapping = false;
+                }
+            }
+            if (farEnough && notOverlapping) {
+                canPlace = true;
+            }
         }
-        e.setPosition(x, y);
         enemies.add(e);
     }
 
@@ -157,6 +216,7 @@ public class GameScreen implements Screen {
         Spear s = spears.first();
         s.setPosition(player.getX(), player.getY());
         s.setWasThrown(false);
+        s.setHeld(true);
         player.setSpear(s);
 
         player.setThrowing(false);
@@ -191,7 +251,7 @@ public class GameScreen implements Screen {
                 enemies.removeValue(e, false);
                 score++;
                 if(e.getCurrentClass() == ActorClass.SPEAR_ENEMY) {
-                    spawnSpear(e.getX(), e.getY());
+                    spawnSpear(e.getX(), e.getY(), spearCount++);
                 }
             }
         }
@@ -256,9 +316,10 @@ public class GameScreen implements Screen {
                 s.setRotation(rightStick.angle() + 180);
             }
             else {
-                if (player.isThrowing()) {
+                if (player.isThrowing() && s.isHeld()) {
                     s.setSpeed(throwSpeed);
                     s.setWasThrown(true);
+                    s.setHeld(false);
                     s.setRotation(s.getRotation());
                     player.setThrowing(false);
                     throwSpeed = 50;
@@ -276,6 +337,9 @@ public class GameScreen implements Screen {
                                 !e.isDead()
                             ) {
                                 e.hurt();
+                                playHurtSound();
+                                playReactionSound();
+                                spearEnemy.play();
                                 e.setCurrentState(ActorState.HURT);
                                 s.setSpeed(s.getSpeed() / 4);
                                 s.setHitAnEnemy(true);
@@ -314,6 +378,7 @@ public class GameScreen implements Screen {
             if (!s.getWasThrown() && !player.hasASpear()) {
                 if (s.getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
                     player.setSpear(s);
+                    s.setHeld(true);
                 }
             }
         }
@@ -347,5 +412,10 @@ public class GameScreen implements Screen {
     @Override
     public void dispose () {
         renderer.dispose();
+        crowdNoise.dispose();
+        reactOne.dispose();
+        reactTwo.dispose();
+        reactThree.dispose();
+        spearWall.dispose();
     }
 }

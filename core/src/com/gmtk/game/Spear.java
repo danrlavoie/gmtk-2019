@@ -12,6 +12,17 @@ public class Spear extends Sprite {
     private float timeInFlight;
     private boolean wasThrown;
     private boolean hitAnEnemy;
+    private boolean held;
+    private int id;
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof Spear && ((Spear)obj).id == this.id);
+    }
+
+    public boolean isHeld() { return held; }
+
+    public void setHeld(boolean held) { this.held = held; }
 
     public boolean getWasThrown() {
         return wasThrown;
@@ -34,7 +45,7 @@ public class Spear extends Sprite {
         return this.speed > 0.05;
     }
 
-    public Spear(Texture texture, float x, float y) {
+    public Spear(Texture texture, float x, float y, int id) {
         super(texture);
         this.setX(x);
         this.setY(y);
@@ -45,6 +56,8 @@ public class Spear extends Sprite {
         this.wasThrown = false;
         this.timeInFlight = 0;
         this.hitAnEnemy = false;
+        this.held = false;
+        this.id = id;
     }
 
     public void resetTimeInFlight() { this.timeInFlight = 0; }
@@ -80,6 +93,7 @@ public class Spear extends Sprite {
                 this.wasThrown = false;
                 this.timeInFlight = 0;
                 this.hitAnEnemy = false;
+                GameScreen.playSpearWallSound();
             }
         }
 

@@ -19,6 +19,15 @@ public class Player extends Sprite {
     private boolean dead;
     final public static ActorClass actorClass = ActorClass.PLAYER;
 
+    public float getMaxSpeed() {
+        if (this.hasASpear()) {
+            return 0.8f * MAX_SPEED;
+        }
+        else {
+            return MAX_SPEED;
+        }
+    }
+
     public boolean isChargingThrow() {
         return chargingThrow;
     }
@@ -116,8 +125,8 @@ public class Player extends Sprite {
         }
 //        Gdx.app.log("XVAL: ", Float.toString(value));
 //        Gdx.app.log("XSPEED: ", Float.toString(this.xSpeed));
-        if (this.xSpeed > MAX_SPEED) this.xSpeed = MAX_SPEED;
-        if (this.xSpeed < -MAX_SPEED) this.xSpeed = -MAX_SPEED;
+        if (this.xSpeed > getMaxSpeed()) this.xSpeed = getMaxSpeed();
+        if (this.xSpeed < -getMaxSpeed()) this.xSpeed = -getMaxSpeed();
     }
     public void accelerateY(float value) {
         if (
@@ -133,8 +142,8 @@ public class Player extends Sprite {
         }
 //        Gdx.app.log("YVAL: ", Float.toString(value));
 //        Gdx.app.log("YSPEED: ", Float.toString(this.ySpeed));
-        if (this.ySpeed > MAX_SPEED) this.ySpeed = MAX_SPEED;
-        if (this.ySpeed < -MAX_SPEED) this.ySpeed = -MAX_SPEED;
+        if (this.ySpeed > getMaxSpeed()) this.ySpeed = getMaxSpeed();
+        if (this.ySpeed < -getMaxSpeed()) this.ySpeed = -getMaxSpeed();
     }
     public void moveX(Array<Sprite> walls) {
         float oldX = this.getX();
