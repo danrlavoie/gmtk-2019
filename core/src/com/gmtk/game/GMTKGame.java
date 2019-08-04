@@ -226,7 +226,7 @@ public class GMTKGame extends ApplicationAdapter {
 					player.getX() - e.getX(), player.getY() - e.getY()
 			);
 			float distanceToPlayer = eToPlayer.len();
-			if (distanceToPlayer > e.getWidth()) {
+			if (!e.isThrowing() && distanceToPlayer > e.getWidth() / 2) {
 				//Gdx.app.log(Integer.toString(e.getId()), "DISTANCE > width");
 				float xAxisValue = (float)Math.cos(eToPlayer.angleRad());
 				float yAxisValue = -(float)Math.sin(eToPlayer.angleRad());
@@ -234,6 +234,11 @@ public class GMTKGame extends ApplicationAdapter {
 				e.accelerateY(yAxisValue);
 				e.moveX(walls, enemies);
 				e.moveY(walls, enemies);
+			}
+			else if (!e.isThrowing()) {
+				// We're close, attack!
+				e.setThrowing(true);
+				e.stopMoving();
 			}
 		}
     }

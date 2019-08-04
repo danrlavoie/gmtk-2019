@@ -123,7 +123,6 @@ public class Renderer {
             w.draw(batch);
         }
 
-        drawPlayer(player);
 
         for (int i = 0; i < player.getHealth(); i ++ ) {
             Sprite heart = new Sprite(heartImage);
@@ -132,15 +131,17 @@ public class Renderer {
         }
 
         for (Enemy e : enemies) {
-            drawEnemy(e);
+            drawEnemy(e, player);
         }
+
+        drawPlayer(player);
         for (Spear s : spears) {
             s.draw(batch);
         }
         batch.end();
     }
 
-    public void drawEnemy(Enemy e) {
+    public void drawEnemy(Enemy e, Player p) {
         Animation<TextureRegion> currentAnimation;
 
         if (e.isChargingThrow() || e.isThrowing()) {
@@ -192,13 +193,19 @@ public class Renderer {
         if (e.isChargingThrow()) {
             // Charging throw, hold on the first animation frame
             currentFrame = currentAnimation.getKeyFrames()[0];
-            animationTimeP -= Gdx.graphics.getDeltaTime();
+            animationTimeES -= Gdx.graphics.getDeltaTime();
         }
         else {
-            currentFrame = currentAnimation.getKeyFrame(animationTimeP, false);
+            currentFrame = currentAnimation.getKeyFrame(animationTimeES, false);
         }
-        if (currentAnimation.isAnimationFinished(animationTimeP)) {
-            animationTimeP = 0f;
+        if (currentAnimation.isAnimationFinished(animationTimeES)) {
+            animationTimeES = 0f;
+            if(e.isThrowing()) {
+                e.setThrowing(false);
+                if(e.getBoundingRectangle().overlaps(p.getBoundingRectangle())) {
+                    p.hurt();
+                }
+            }
         }
         boolean flip = (e.isMovingRight());
         batch.draw(
