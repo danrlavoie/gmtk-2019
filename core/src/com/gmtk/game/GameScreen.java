@@ -20,6 +20,7 @@ public class GameScreen implements Screen {
     private Array<Sprite> walls;
     private Array<Enemy> enemies;
     private static int enemyCount = 0;
+    public static int score = 0;
 
     final public static int CANVAS_WIDTH = 1600;
     final public static int CANVAS_HEIGHT = 900;
@@ -153,6 +154,7 @@ public class GameScreen implements Screen {
         for (Enemy e : enemies) {
             if (e.isDead()) {
                 enemies.removeValue(e, false);
+                score++;
             }
         }
     }

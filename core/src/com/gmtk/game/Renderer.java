@@ -2,10 +2,7 @@ package com.gmtk.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Array;
 
 public class Renderer {
@@ -14,6 +11,7 @@ public class Renderer {
     Texture spearImage;
     Texture wallImage;
     Texture heartImage;
+    BitmapFont font;
 
     float animationTimeP;
     float animationTimeES;
@@ -38,6 +36,7 @@ public class Renderer {
     Texture spearEnemySheet;
 
     public Renderer() {
+        this.font = new BitmapFont();
         this.batch = new SpriteBatch();
         playerImage = new Texture(Gdx.files.internal("bucket.png"));
         spearImage = new Texture(Gdx.files.internal("spear.png"));
@@ -122,6 +121,7 @@ public class Renderer {
         for (Sprite w : walls) {
             w.draw(batch);
         }
+        this.font.draw(this.batch, Util.IntegerToRoman(GameScreen.score), 50, 450);
 
 
         for (int i = 0; i < player.getHealth(); i ++ ) {
@@ -306,5 +306,6 @@ public class Renderer {
         enemySheet.dispose();
         heartImage.dispose();
         spearEnemySheet.dispose();
+        font.dispose();
     }
 }
