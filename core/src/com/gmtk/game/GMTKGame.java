@@ -25,6 +25,7 @@ public class GMTKGame extends ApplicationAdapter {
 
 	private Array<Spear> spears;
 	private Array<Sprite> walls;
+	private Array<Enemy> enemies;
 
 	final public static int CANVAS_WIDTH = 1600;
 	final public static int CANVAS_HEIGHT = 900;
@@ -57,10 +58,13 @@ public class GMTKGame extends ApplicationAdapter {
 
 		spears = new Array<Spear>();
 		spawnSpear();
+        player = new Player(renderer.playerImage, spears.first());
 
 		walls = new Array<Sprite>();
 		spawnWalls();
-		player = new Player(renderer.playerImage, spears.first());
+
+		enemies = new Array<Enemy>();
+		spawnEnemy();
 	}
 
 	private void spawnSpear() {
@@ -89,16 +93,17 @@ public class GMTKGame extends ApplicationAdapter {
 		}
 	}
 
-	private void spawnEnemy() {
+	public void spawnEnemy() {
 	    // playerImage is a placeholder for a 64x64 sprite
 	    Enemy e = new Enemy(renderer.playerImage, ActorClass.ENEMY, null);
         float x = player.getX();
         float y = player.getY();
         while (Vector2.dst(x, y, player.getX(), player.getY()) < 200) {
-            x = MathUtils.random(0, 1600);
-            y = MathUtils.random(0, 900);
+            x = MathUtils.random(300, 1250);
+            y = MathUtils.random(64, 800);
         }
         e.setPosition(x, y);
+        enemies.add(e);
     }
 
     public void resetSpear() {
@@ -117,11 +122,12 @@ public class GMTKGame extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
-        renderer.drawSprites(player, spears, walls);
+        renderer.drawSprites(player, spears, walls, enemies);
 
 		handleThrowMechanics();
         movePlayer();
         moveSpears();
+        moveEnemies();
 	}
 
 
@@ -206,6 +212,10 @@ public class GMTKGame extends ApplicationAdapter {
                 }
             }
         }
+    }
+
+    private void moveEnemies() {
+
     }
 	
 	@Override

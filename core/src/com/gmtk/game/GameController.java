@@ -32,6 +32,9 @@ public class GameController implements ControllerListener {
         if (buttonCode == 0) {
             game.resetSpear();
         }
+        if (buttonCode == 1) {
+            game.spawnEnemy();
+        }
         return false;
     }
 

@@ -14,6 +14,7 @@ public class Player extends Sprite {
     private ActorState currentState;
     private boolean chargingThrow;
     private boolean throwing;
+    private int health;
 
     public boolean isChargingThrow() {
         return chargingThrow;
@@ -53,6 +54,13 @@ public class Player extends Sprite {
         this.ySpeed = 0;
     }
 
+    public void hurt() {
+        this.health -= 1;
+    }
+
+    public int getHealth() {
+        return this.health;
+    }
 
     public Player(Texture texture, Spear spear) {
         super(texture);
@@ -66,6 +74,7 @@ public class Player extends Sprite {
         this.currentState = ActorState.IDLE;
         this.chargingThrow = false;
         this.throwing = false;
+        this.health = 3;
     }
 
     public void setSpear(Spear s) {

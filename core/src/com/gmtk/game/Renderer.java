@@ -13,15 +13,16 @@ public class Renderer {
     Texture playerImage;
     Texture spearImage;
     Texture wallImage;
+    Texture heartImage;
 
-    float animationTime;
+    float animationTimeP;
+    float animationTimeES;
 
     Animation<TextureRegion> idleAnimationP;
     Animation<TextureRegion> walkAnimationP;
     Animation<TextureRegion> throwAnimationP;
     Animation<TextureRegion> hurtAnimationP;
     Animation<TextureRegion> dieAnimationP;
-    Animation<TextureRegion> currentAnimation;
     Animation<TextureRegion> idleAnimationE;
     Animation<TextureRegion> walkAnimationE;
     Animation<TextureRegion> throwAnimationE;
@@ -41,6 +42,7 @@ public class Renderer {
         playerImage = new Texture(Gdx.files.internal("bucket.png"));
         spearImage = new Texture(Gdx.files.internal("spear.png"));
         wallImage = new Texture(Gdx.files.internal("wall.png"));
+        heartImage = new Texture(Gdx.files.internal("heart.png"));
         playerSheet = new Texture(Gdx.files.internal("player.png"));
         enemySheet = new Texture(Gdx.files.internal("gladiator.png"));
         spearEnemySheet = new Texture(Gdx.files.internal("spear-gladiator.png"));
@@ -95,7 +97,6 @@ public class Renderer {
         throwAnimationP = new Animation<TextureRegion>(0.1f, throwFramesP);
         hurtAnimationP = new Animation<TextureRegion>(0.1f, hurtFramesP);
         dieAnimationP = new Animation<TextureRegion>(0.1f, dieFramesP);
-        currentAnimation = idleAnimationP;
         idleAnimationE = new Animation<TextureRegion>(0.1f, idleFramesE);
         walkAnimationE = new Animation<TextureRegion>(0.1f, walkFramesE);
         throwAnimationE = new Animation<TextureRegion>(0.1f, throwFramesE);
@@ -106,23 +107,116 @@ public class Renderer {
         throwAnimationS = new Animation<TextureRegion>(0.1f, throwFramesS);
         hurtAnimationS = new Animation<TextureRegion>(0.1f, hurtFramesS);
         dieAnimationS = new Animation<TextureRegion>(0.1f, dieFramesS);
-        animationTime = 0f;
+        animationTimeP = 0f;
     }
 
-    public void drawSprites(Player player, Array<Spear> spears, Array<Sprite> walls) {
-        animationTime += Gdx.graphics.getDeltaTime();
+    public void drawSprites(
+            Player player,
+            Array<Spear> spears,
+            Array<Sprite> walls,
+            Array<Enemy> enemies
+    ) {
+        animationTimeP += Gdx.graphics.getDeltaTime();
+        animationTimeES += Gdx.graphics.getDeltaTime();
         batch.begin();
         for (Sprite w : walls) {
             w.draw(batch);
         }
-        if (
-                (player.isChargingThrow() || player.isThrowing())
-        ) {
+
+        drawPlayer(player);
+
+        for (int i = 0; i < player.getHealth(); i ++ ) {
+            Sprite heart = new Sprite(heartImage);
+            heart.setPosition(50, 800 - 96 * i);
+            heart.draw(batch);
+        }
+
+        for (Enemy e : enemies) {
+            drawEnemy(e);
+        }
+        for (Spear s : spears) {
+            s.draw(batch);
+        }
+        batch.end();
+    }
+
+    public void drawEnemy(Enemy e) {
+        Animation<TextureRegion> currentAnimation;
+
+        if (e.isChargingThrow() || e.isThrowing()) {
+            e.setCurrentState(ActorState.THROWING);
+        }
+        else if (e.isMoving()) {
+            e.setCurrentState(ActorState.WALKING);
+        }
+        else {
+            e.setCurrentState(ActorState.IDLE);
+        }
+        if (e.getCurrentClass() == ActorClass.ENEMY) {
+            switch(e.getCurrentState()) {
+                case WALKING:
+                    currentAnimation = walkAnimationE;
+                    break;
+                case HURT:
+                    currentAnimation = hurtAnimationE;
+                    break;
+                case DYING:
+                    currentAnimation = dieAnimationP;
+                    break;
+                case THROWING:
+                    currentAnimation = throwAnimationE;
+                    break;
+                default:
+                    currentAnimation = idleAnimationE;
+            }
+        }
+        else {// if (e.getCurrentClass() == ActorClass.SPEAR_ENEMY) {
+            switch(e.getCurrentState()) {
+                case WALKING:
+                    currentAnimation = walkAnimationS;
+                    break;
+                case HURT:
+                    currentAnimation = hurtAnimationS;
+                    break;
+                case DYING:
+                    currentAnimation = dieAnimationS;
+                    break;
+                case THROWING:
+                    currentAnimation = throwAnimationS;
+                    break;
+                default:
+                    currentAnimation = idleAnimationS;
+            }
+        }
+        TextureRegion currentFrame;
+        if (e.isChargingThrow()) {
+            // Charging throw, hold on the first animation frame
+            currentFrame = currentAnimation.getKeyFrames()[0];
+            animationTimeP -= Gdx.graphics.getDeltaTime();
+        }
+        else {
+            currentFrame = currentAnimation.getKeyFrame(animationTimeP, false);
+        }
+        if (currentAnimation.isAnimationFinished(animationTimeP)) {
+            animationTimeP = 0f;
+        }
+        boolean flip = (e.isMovingRight());
+        batch.draw(
+                currentFrame,
+                flip ? e.getX() + e.getWidth() : e.getX(),
+                e.getY(),
+                flip ? -e.getWidth() : e.getWidth(),
+                e.getHeight()
+        );
+    }
+
+    public void drawPlayer(Player player) {
+        Animation<TextureRegion> currentAnimation;
+
+        if ((player.isChargingThrow() || player.isThrowing())) {
             player.setCurrentState(ActorState.THROWING);
         }
-        else if (
-                player.isMoving()
-        ) {
+        else if (player.isMoving()) {
             player.setCurrentState(ActorState.WALKING);
         }
         else {
@@ -148,13 +242,13 @@ public class Renderer {
         if (player.isChargingThrow()) {
             // Charging throw, hold on the first animation frame
             currentFrame = currentAnimation.getKeyFrames()[0];
-            animationTime -= Gdx.graphics.getDeltaTime();
+            animationTimeP -= Gdx.graphics.getDeltaTime();
         }
         else {
-            currentFrame = currentAnimation.getKeyFrame(animationTime, false);
+            currentFrame = currentAnimation.getKeyFrame(animationTimeP, false);
         }
-        if (currentAnimation.isAnimationFinished(animationTime)) {
-            animationTime = 0f;
+        if (currentAnimation.isAnimationFinished(animationTimeP)) {
+            animationTimeP = 0f;
         }
         boolean flip = (player.isMovingRight());
         batch.draw(
@@ -164,10 +258,6 @@ public class Renderer {
                 flip ? -player.getWidth() : player.getWidth(),
                 player.getHeight()
         );
-        for (Spear s : spears) {
-            s.draw(batch);
-        }
-        batch.end();
     }
     public void dispose() {
         batch.dispose();
@@ -175,5 +265,8 @@ public class Renderer {
         playerSheet.dispose();
         spearImage.dispose();
         wallImage.dispose();
+        enemySheet.dispose();
+        heartImage.dispose();
+        spearEnemySheet.dispose();
     }
 }
