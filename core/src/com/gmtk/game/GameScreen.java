@@ -66,8 +66,8 @@ public class GameScreen implements Screen {
         rounds.add(new char[]{'E', 'E', 'E', 'S'});
 
         spears = new Array<Spear>();
-        spawnSpear();
-        player = new Player(renderer.playerImage, spears.first());
+        spawnSpear(800, 450);
+        player = new Player(renderer.playerImage, null);
 
         walls = new Array<Sprite>();
         spawnWalls();
@@ -105,8 +105,8 @@ public class GameScreen implements Screen {
     }
 
 
-    private void spawnSpear() {
-        Spear spear = new Spear(renderer.spearImage);
+    private void spawnSpear(float x, float y) {
+        Spear spear = new Spear(renderer.spearImage, x, y);
         spears.add(spear);
     }
 
@@ -190,6 +190,9 @@ public class GameScreen implements Screen {
             if (e.isDead()) {
                 enemies.removeValue(e, false);
                 score++;
+                if(e.getCurrentClass() == ActorClass.SPEAR_ENEMY) {
+                    spawnSpear(e.getX(), e.getY());
+                }
             }
         }
         if (enemies.size == 0) {
@@ -264,14 +267,19 @@ public class GameScreen implements Screen {
             if (s.getWasThrown()) {
                 if (s.isMoving()) {
                     s.move(walls);
-                    for (Enemy e: enemies) {
-                        if (
-                            e.getBoundingRectangle().overlaps(s.getBoundingRectangle()) &&
-                            !e.isDying()
-                        ) {
-                            e.hurt();
-                            e.setCurrentState(ActorState.HURT);
-                            s.setSpeed(s.getSpeed() / 2 );
+//                    Gdx.app.log("HIT: ", Boolean.toString(s.didHitAnEnemy()));
+                    if (!s.didHitAnEnemy()) {
+                        for (Enemy e : enemies) {
+                            if (
+                                e.getBoundingRectangle().overlaps(s.getBoundingRectangle()) &&
+                                !e.isDying() &&
+                                !e.isDead()
+                            ) {
+                                e.hurt();
+                                e.setCurrentState(ActorState.HURT);
+                                s.setSpeed(s.getSpeed() / 4);
+                                s.setHitAnEnemy(true);
+                            }
                         }
                     }
                 }
@@ -279,6 +287,7 @@ public class GameScreen implements Screen {
                     if (s.getWasThrown()) {
                         s.setWasThrown(false);
                         s.resetTimeInFlight();
+                        s.setHitAnEnemy(false);
                     }
                 }
             }

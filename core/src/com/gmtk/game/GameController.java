@@ -28,7 +28,7 @@ public class GameController implements ControllerListener {
 
     @Override
     public boolean buttonUp(Controller controller, int buttonCode) {
-        Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
+//        Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
         if (buttonCode == 0) {
             game.resetSpear();
         }
