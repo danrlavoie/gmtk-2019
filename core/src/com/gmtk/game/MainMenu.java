@@ -27,7 +27,7 @@ public class MainMenu implements Screen {
             @Override
             public boolean buttonUp(Controller controller, int buttonCode) {
                 Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
-                if (buttonCode == 7) {
+                if (buttonCode == 7 && !(game.getScreen() instanceof GameScreen)) {
                     game.setScreen(new GameScreen(game));
                     dispose();
                 }

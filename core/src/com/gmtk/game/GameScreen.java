@@ -214,11 +214,20 @@ public class GameScreen implements Screen {
                 if (s.isMoving()) {
                     s.move(walls);
                     for (Enemy e: enemies) {
-                        if (e.getBoundingRectangle().overlaps(s.getBoundingRectangle())) {
+                        if (
+                            e.getBoundingRectangle().overlaps(s.getBoundingRectangle()) &&
+                            !e.isDying()
+                        ) {
                             e.hurt();
                             e.setCurrentState(ActorState.HURT);
-                            s.setSpeed(s.getSpeed() / 4);
+                            s.setSpeed(s.getSpeed() / 2 );
                         }
+                    }
+                }
+                else {
+                    if (s.getWasThrown()) {
+                        s.setWasThrown(false);
+                        s.resetTimeInFlight();
                     }
                 }
             }

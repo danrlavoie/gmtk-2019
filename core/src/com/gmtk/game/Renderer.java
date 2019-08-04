@@ -144,8 +144,13 @@ public class Renderer {
     public void drawEnemy(Enemy e, Player p) {
         Animation<TextureRegion> currentAnimation;
 
-        if(!(e.getCurrentState() == ActorState.HURT)) {
+        if(!(e.getCurrentState() == ActorState.HURT ||
+                e.getCurrentState() == ActorState.DYING
+        )) {
             if (e.isChargingThrow() || e.isThrowing()) {
+                if (e.getCurrentState() != ActorState.THROWING) {
+                    animationTimeES = 0;
+                }
                 e.setCurrentState(ActorState.THROWING);
             } else if (e.isMoving()) {
                 e.setCurrentState(ActorState.WALKING);
@@ -153,8 +158,10 @@ public class Renderer {
                 e.setCurrentState(ActorState.IDLE);
             }
         } else {
-            if (e.getHealth() <= 0) {
+            if (e.getHealth() <= 0 && !e.isDying()) {
+                animationTimeES = 0f;
                 e.setDying(true);
+                e.setThrowing(false);
                 e.setCurrentState(ActorState.DYING);
             }
         }
@@ -167,7 +174,7 @@ public class Renderer {
                     currentAnimation = hurtAnimationE;
                     break;
                 case DYING:
-                    currentAnimation = dieAnimationP;
+                    currentAnimation = dieAnimationE;
                     break;
                 case THROWING:
                     currentAnimation = throwAnimationE;
@@ -240,7 +247,8 @@ public class Renderer {
                 player.setCurrentState(ActorState.IDLE);
             }
         } else {
-            if (player.getHealth() <= 0) {
+            if (player.getHealth() <= 0 && !player.isDying()) {
+                animationTimeP = 0f;
                 player.setDying(true);
                 player.setCurrentState(ActorState.DYING);
             }

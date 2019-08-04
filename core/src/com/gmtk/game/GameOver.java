@@ -22,18 +22,6 @@ public class GameOver implements Screen {
         game.batch.begin();
         game.font.draw(game.batch, "PRESS START TO PLAY AGAIN", 800, 450);
         game.batch.end();
-
-        Controllers.addListener(new ControllerAdapter() {
-            @Override
-            public boolean buttonUp(Controller controller, int buttonCode) {
-                Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
-                if (buttonCode == 7) {
-                    game.setScreen(new GameScreen(game));
-                    dispose();
-                }
-                return false;
-            }
-        });
     }
 
     @Override

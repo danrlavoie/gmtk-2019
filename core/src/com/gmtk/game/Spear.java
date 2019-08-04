@@ -26,7 +26,7 @@ public class Spear extends Sprite {
     private boolean wasThrown;
 
     public boolean isMoving() {
-        return this.speed > 0;
+        return this.speed > 0.05;
     }
 
     public Spear(Texture texture) {
@@ -40,6 +40,8 @@ public class Spear extends Sprite {
         this.wasThrown = false;
         this.timeInFlight = 0;
     }
+
+    public void resetTimeInFlight() { this.timeInFlight = 0; }
     public void setSpeed(float value) {
         this.speed = value;
     }
