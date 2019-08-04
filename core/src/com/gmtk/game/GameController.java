@@ -33,7 +33,7 @@ public class GameController implements ControllerListener {
             game.resetSpear();
         }
         if (buttonCode == 1) {
-            game.spawnEnemy();
+            game.spawnEnemy('E');
         }
         return false;
     }

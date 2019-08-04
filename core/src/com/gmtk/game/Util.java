@@ -17,3 +17,12 @@ public class Util {
         return roman;
     }
 }
+
+/*
+To do:
+Make score display larger
+Automate the enemy spawning
+Support multiple spears (and debug)
+Add sounds
+Refine the menu screens
+ */

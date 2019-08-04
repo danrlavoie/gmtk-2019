@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class GameScreen implements Screen {
     final TheGame game;
@@ -35,6 +36,11 @@ public class GameScreen implements Screen {
     public float leftStickDebounce;
     public float rightStickDebounce;
 
+    private boolean startingRound;
+    private long roundStartTime;
+
+    private Array<char[]> rounds;
+    private int roundIndex;
 
     public GameScreen(final TheGame game) {
         this.game = game;
@@ -52,6 +58,13 @@ public class GameScreen implements Screen {
         leftStickDebounce = 0;
         rightStickDebounce = 0;
 
+        roundIndex = 0;
+        rounds = new Array<char[]>();
+        rounds.add(new char[]{'E'});
+        rounds.add(new char[]{'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'S'});
+
         spears = new Array<Spear>();
         spawnSpear();
         player = new Player(renderer.playerImage, spears.first());
@@ -60,13 +73,20 @@ public class GameScreen implements Screen {
         spawnWalls();
 
         enemies = new Array<Enemy>();
+
     }
 
     @Override
     public void show() {
         // stuff that happens
         // when the screen is shown
-        spawnEnemy();
+        //spawnEnemy();
+        startingRound = true;
+        char[] c = rounds.get(roundIndex);
+        for (int i = 0; i < c.length; i++) {
+            spawnEnemy(c[i]);
+        }
+        roundStartTime = TimeUtils.nanoTime();
     }
 
     @Override
@@ -111,10 +131,18 @@ public class GameScreen implements Screen {
         }
     }
 
-    public void spawnEnemy() {
+    public void spawnEnemy(char c) {
         // playerImage is a placeholder for a 64x64 sprite
         enemyCount++;
-        Enemy e = new Enemy(renderer.playerImage, ActorClass.ENEMY, null, enemyCount);
+        ActorClass a = ActorClass.ENEMY;
+        if (c == 'E') {
+            a = ActorClass.ENEMY;
+        } else if (c == 'S') {
+            a = ActorClass.SPEAR_ENEMY;
+        } else if (c == 'L') {
+            a = ActorClass.LION;
+        }
+        Enemy e = new Enemy(renderer.playerImage, a, null, enemyCount);
         float x = player.getX();
         float y = player.getY();
         while (Vector2.dst(x, y, player.getX(), player.getY()) < 200) {
@@ -143,10 +171,17 @@ public class GameScreen implements Screen {
 
         renderer.drawSprites(player, spears, walls, enemies);
 
-        handleThrowMechanics();
-        movePlayer();
-        moveSpears();
-        moveEnemies();
+        if (!startingRound) {
+            handleThrowMechanics();
+            movePlayer();
+            moveSpears();
+            moveEnemies();
+        }
+        else {
+            if (TimeUtils.nanoTime() - roundStartTime > 2000000000) {
+                startingRound = false;
+            }
+        }
 
         if (player.isDead()) {
             game.setScreen(new GameOver(game));
@@ -155,6 +190,20 @@ public class GameScreen implements Screen {
             if (e.isDead()) {
                 enemies.removeValue(e, false);
                 score++;
+            }
+        }
+        if (enemies.size == 0) {
+            startingRound = true;
+            roundStartTime = TimeUtils.nanoTime();
+            roundIndex++;
+            if (roundIndex < rounds.size) {
+                char[] c = rounds.get(roundIndex);
+                for (int i = 0; i < c.length; i++) {
+                    spawnEnemy(c[i]);
+                }
+            }
+            else {
+                // Go to endgame screen
             }
         }
     }
