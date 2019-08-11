@@ -17,6 +17,7 @@ public class TextRenderer {
     private boolean isFullyRendered;
     private boolean isRendering;
     private int currentChar;
+    private String messageInMemory;
     public TextRenderer() {
         this.batch = new SpriteBatch();
         this.font = new BitmapFont();
@@ -24,25 +25,38 @@ public class TextRenderer {
         this.textBoxTexture = new Texture(Gdx.files.internal("text-box.png"));
         this.textBox = new Rectangle(0,0,textBoxTexture.getWidth(),textBoxTexture.getHeight());
         this.currentChar = 0;
-        this.isFullyRendered = false;
+        this.isFullyRendered = true;
         this.isRendering = false;
         this.lastCharTime = TimeUtils.nanoTime();
     }
-    public void renderBlockOfText() {
-        String message = String.join(
-                "\n",
-                "The veteran... did not have it in him.",
-                "The only memory of today will be the audience's",
-                "laughs at his pitiful performance."
-        );
-        if (this.currentChar >= message.length()) {
-            this.isFullyRendered = true;
-            this.isRendering = false;
+
+    public boolean advanceToEndOfBlock() {
+        if (!this.isFullyRendered) {
+            this.currentChar = this.messageInMemory.length() -1;
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    public void renderBlockOfText(String message) {
+        if (message == null) {
+            return;
         }
         if (!this.isFullyRendered) {
             if (TimeUtils.nanoTime() - lastCharTime > TIME_BETWEEN_CHARACTERS) {
                 this.currentChar++;
             }
+        }
+        if (messageInMemory != message) {
+            this.messageInMemory = message;
+            this.isFullyRendered = false;
+            this.isRendering = true;
+            this.currentChar = 0;
+        }
+        if (this.currentChar >= messageInMemory.length()) {
+            this.isFullyRendered = true;
+            this.isRendering = false;
         }
 
 
@@ -51,7 +65,7 @@ public class TextRenderer {
         batch.draw(textBoxTexture,textBox.x,textBox.y);
         font.draw(
             batch,
-            message.substring(0, currentChar),
+            messageInMemory.substring(0, currentChar),
             20,
             348
         );
