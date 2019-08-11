@@ -38,6 +38,8 @@ public class Renderer {
 
     public Renderer() {
         this.font = new BitmapFont();
+        this.font.getData().setScale(4,4);
+
         this.batch = new SpriteBatch();
         playerImage = new Texture(Gdx.files.internal("bucket.png"));
         spearImage = new Texture(Gdx.files.internal("spear.png"));

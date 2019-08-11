@@ -6,11 +6,15 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 
 public class MainMenu implements Screen {
     final TheGame game;
+    private Texture menuImage;
 
     public MainMenu(final TheGame game) {
+
+        menuImage = new Texture(Gdx.files.internal("titlescreen.png"));
         this.game = game;
     }
 
@@ -20,7 +24,8 @@ public class MainMenu implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.begin();
-        game.font.draw(game.batch, "PRESS START TO PLAY", 800, 450);
+        game.batch.draw(menuImage, 0, 0);
+        //game.font.draw(game.batch, "PRESS START TO PLAY", 800, 450);
         game.batch.end();
 
         Controllers.addListener(new ControllerAdapter() {
@@ -29,6 +34,7 @@ public class MainMenu implements Screen {
 //                Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
                 if (buttonCode == 7 && !(game.getScreen() instanceof GameScreen)) {
                     game.setScreen(new GameScreen(game));
+                    GameScreen.score = 0;
                     dispose();
                 }
                 return false;

@@ -37,7 +37,7 @@ public class GameScreen implements Screen {
     private Array<Sprite> walls;
     private Array<Enemy> enemies;
     private static int enemyCount = 0;
-    public static int score = 0;
+    public static int score = 1;
     private static int spearCount = 0;
 
     final public static int CANVAS_WIDTH = 1600;
@@ -98,6 +98,23 @@ public class GameScreen implements Screen {
         rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'S'});
         rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
         rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'S', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'S', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'S', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
+        rounds.add(new char[]{'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E'});
 
         spears = new Array<Spear>();
         spawnSpear(800, 450, spearCount++);
@@ -249,13 +266,13 @@ public class GameScreen implements Screen {
         for (Enemy e : enemies) {
             if (e.isDead()) {
                 enemies.removeValue(e, false);
-                score++;
                 if(e.getCurrentClass() == ActorClass.SPEAR_ENEMY) {
                     spawnSpear(e.getX(), e.getY(), spearCount++);
                 }
             }
         }
         if (enemies.size == 0) {
+            score++;
             startingRound = true;
             roundStartTime = TimeUtils.nanoTime();
             roundIndex++;

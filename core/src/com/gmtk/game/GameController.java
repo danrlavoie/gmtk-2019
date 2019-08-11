@@ -30,10 +30,10 @@ public class GameController implements ControllerListener {
     public boolean buttonUp(Controller controller, int buttonCode) {
 //        Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
         if (buttonCode == 0) {
-            game.resetSpear();
+//            game.resetSpear();
         }
         if (buttonCode == 1) {
-            game.spawnEnemy('E');
+//            game.spawnEnemy('E');
         }
         return false;
     }
