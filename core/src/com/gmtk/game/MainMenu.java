@@ -11,35 +11,37 @@ import com.badlogic.gdx.graphics.Texture;
 public class MainMenu implements Screen {
     final TheGame game;
     private Texture menuImage;
+    private TextRenderer textRenderer;
 
     public MainMenu(final TheGame game) {
 
         menuImage = new Texture(Gdx.files.internal("titlescreen.png"));
         this.game = game;
+        this.textRenderer = new TextRenderer();
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        game.batch.begin();
-        game.batch.draw(menuImage, 0, 0);
+        textRenderer.renderBlockOfText();
+//        game.batch.begin();
+//        game.batch.draw(menuImage, 0, 0);
         //game.font.draw(game.batch, "PRESS START TO PLAY", 800, 450);
-        game.batch.end();
+//        game.batch.end();
 
-        Controllers.addListener(new ControllerAdapter() {
-            @Override
-            public boolean buttonUp(Controller controller, int buttonCode) {
-//                Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
-                if (buttonCode == 7 && !(game.getScreen() instanceof GameScreen)) {
-                    game.setScreen(new GameScreen(game));
-                    GameScreen.score = 0;
-                    dispose();
-                }
-                return false;
-            }
-        });
+//        Controllers.addListener(new ControllerAdapter() {
+//            @Override
+//            public boolean buttonUp(Controller controller, int buttonCode) {
+////                Gdx.app.log("Controller: " + controller.getName(), "button pressed: " + buttonCode);
+//                if (buttonCode == 7 && !(game.getScreen() instanceof GameScreen)) {
+//                    game.setScreen(new GameScreen(game));
+//                    GameScreen.score = 0;
+//                    dispose();
+//                }
+//                return false;
+//            }
+//        });
     }
 
     @Override
@@ -63,5 +65,6 @@ public class MainMenu implements Screen {
     }
     @Override
     public void dispose() {
+        textRenderer.dispose();
     }
 }
