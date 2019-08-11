@@ -15,7 +15,6 @@ public class TextRenderer {
     private long lastCharTime;
     private final long TIME_BETWEEN_CHARACTERS = 1000000000;
     private boolean isFullyRendered;
-    private boolean isRendering;
     private int currentChar;
     private String messageInMemory;
     public TextRenderer() {
@@ -26,10 +25,15 @@ public class TextRenderer {
         this.textBox = new Rectangle(0,0,textBoxTexture.getWidth(),textBoxTexture.getHeight());
         this.currentChar = 0;
         this.isFullyRendered = true;
-        this.isRendering = false;
         this.lastCharTime = TimeUtils.nanoTime();
     }
 
+    /**
+     * A control function to advance to the end of the current block of text.
+     *
+     * @return True if the block was already at the end, therefore nothing happened.
+     *         False if the block was not at the end, but has now been advanced.
+     */
     public boolean advanceToEndOfBlock() {
         if (!this.isFullyRendered) {
             this.currentChar = this.messageInMemory.length() -1;
@@ -39,6 +43,13 @@ public class TextRenderer {
             return true;
         }
     }
+
+    /**
+     * Given a message, assigns the message to memory and renders the message bit by bit.
+     * If the message changes from the one in memory, starts over from the beginning with
+     * this new message
+     * @param message the string of text to render. Pays no heed to line length or anything.
+     */
     public void renderBlockOfText(String message) {
         if (message == null) {
             return;
@@ -51,16 +62,11 @@ public class TextRenderer {
         if (messageInMemory != message) {
             this.messageInMemory = message;
             this.isFullyRendered = false;
-            this.isRendering = true;
             this.currentChar = 0;
         }
         if (this.currentChar >= messageInMemory.length()) {
             this.isFullyRendered = true;
-            this.isRendering = false;
         }
-
-
-
         batch.begin();
         batch.draw(textBoxTexture,textBox.x,textBox.y);
         font.draw(
@@ -72,6 +78,9 @@ public class TextRenderer {
         batch.end();
     }
 
+    /**
+     * A cleanup function. Make sure to call this when the app using this class is disposed.
+     */
     public void dispose() {
         this.batch.dispose();
         this.font.dispose();

@@ -10,47 +10,9 @@ public class Player extends Sprite {
     final private float MAX_SPEED = 20;
     final private float DECELERATE = 0.9f;
     private int width, height;
-    private Spear spear;
-    private ActorState currentState;
-    private boolean chargingThrow;
-    private boolean throwing;
-    private int health;
-    private boolean dying;
-    private boolean dead;
-    final public static ActorClass actorClass = ActorClass.PLAYER;
 
     public float getMaxSpeed() {
-        if (this.hasASpear()) {
-            return 0.8f * MAX_SPEED;
-        }
-        else {
-            return MAX_SPEED;
-        }
-    }
-
-    public boolean isChargingThrow() {
-        return chargingThrow;
-    }
-
-    public void setChargingThrow(boolean chargingThrow) {
-        this.chargingThrow = chargingThrow;
-    }
-
-    public boolean isThrowing() {
-        return throwing;
-    }
-
-    public void setThrowing(boolean throwing) {
-        this.throwing = throwing;
-    }
-
-
-    public ActorState getCurrentState() {
-        return currentState;
-    }
-
-    public void setCurrentState(ActorState currentState) {
-        this.currentState = currentState;
+        return MAX_SPEED;
     }
 
     public boolean isMovingRight() {
@@ -66,15 +28,7 @@ public class Player extends Sprite {
         this.ySpeed = 0;
     }
 
-    public void hurt() {
-        this.health -= 1;
-    }
-
-    public int getHealth() {
-        return this.health;
-    }
-
-    public Player(Texture texture, Spear spear) {
+    public Player(Texture texture) {
         super(texture);
         this.setX(1600 / 2 - 64 / 2);
         this.setY(900 / 2 - 64 / 2);
@@ -82,34 +36,6 @@ public class Player extends Sprite {
         this.ySpeed = 0;
         this.width = 64;
         this.height = 64;
-        this.spear = spear;
-        this.currentState = ActorState.IDLE;
-        this.chargingThrow = false;
-        this.throwing = false;
-        this.health = 3;
-        this.dying = false;
-        this.dead = false;
-    }
-
-    public boolean isDying() { return this.dying; }
-
-    public void setDying(boolean dying) { this.dying = dying; }
-
-    public boolean isDead() { return this.dead; }
-
-    public void setDead(boolean dead) { this.dead = dead; }
-
-    public void setSpear(Spear s) {
-        this.spear = s;
-    }
-
-    public boolean hasSpear(Spear s) {
-        if (this.spear == null) return false;
-        return (this.spear.equals(s));
-    }
-
-    public boolean hasASpear() {
-        return (this.spear != null);
     }
 
     public void accelerateX(float value) {
