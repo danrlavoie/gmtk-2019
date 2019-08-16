@@ -16,14 +16,14 @@ public class DialogKeyboardInputProcessor extends InputAdapter {
     }
 
     public boolean keyUp (int keycode) {
+        if (dialogManager.anyDialogToRender() && keycode == Input.Keys.SPACE) {
+            dialogManager.handleDialogAdvanceInput();
+            return true;
+        }
         return false;
     }
 
     public boolean keyTyped (char character) {
-        if (dialogManager.anyDialogToRender() && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            dialogManager.handleDialogAdvanceInput();
-            return true;
-        }
         return false;
     }
 }

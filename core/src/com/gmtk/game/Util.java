@@ -34,6 +34,11 @@ public class Util {
     public static void betterLog(String message) {
         Gdx.app.log("LOG", message);
     }
+
+
+    public enum Direction {
+        UP, DOWN, LEFT, RIGHT
+    }
 }
 
 /*
