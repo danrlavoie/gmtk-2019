@@ -1,4 +1,4 @@
-package com.gmtk.game;
+package com.gmtk.game.dialog;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -7,17 +7,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.TimeUtils;
 
-public class TextRenderer {
+public class DialogRenderer {
     private SpriteBatch batch;
     private BitmapFont font;
     private Texture textBoxTexture;
     private Rectangle textBox;
     private long lastCharTime;
-    private final long TIME_BETWEEN_CHARACTERS = 1000000000;
+    private final long TIME_BETWEEN_CHARACTERS = 10000000;
     private boolean isFullyRendered;
     private int currentChar;
     private String messageInMemory;
-    public TextRenderer() {
+
+
+    public DialogRenderer() {
         this.batch = new SpriteBatch();
         this.font = new BitmapFont();
         this.font.getData().setScale(2,2);
@@ -56,6 +58,7 @@ public class TextRenderer {
         }
         if (!this.isFullyRendered) {
             if (TimeUtils.nanoTime() - lastCharTime > TIME_BETWEEN_CHARACTERS) {
+                this.lastCharTime = TimeUtils.nanoTime();
                 this.currentChar++;
             }
         }

@@ -62,7 +62,6 @@ public class VictoryScreen implements Screen {
                 75
         );
         game.batch.end();
-        GameScreen.score = 0;
     }
 
     @Override

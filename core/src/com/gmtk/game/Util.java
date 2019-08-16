@@ -1,5 +1,7 @@
 package com.gmtk.game;
 
+import com.badlogic.gdx.Gdx;
+
 public class Util {
     public static String IntegerToRoman(int n){
         String roman="";
@@ -15,6 +17,22 @@ public class Util {
             n=n%magnitude[x];
         }
         return roman;
+    }
+
+    public static void betterLog(String tag, int i) {
+        Gdx.app.log(tag, Integer.toString(i));
+    }
+    public static void betterLog(String tag, float i) {
+        Gdx.app.log(tag, Float.toString(i));
+    }
+    public static void betterLog(String tag, boolean i) {
+        Gdx.app.log(tag, Boolean.toString(i));
+    }
+    public static void betterLog(String tag, String i) {
+        Gdx.app.log(tag, i);
+    }
+    public static void betterLog(String message) {
+        Gdx.app.log("LOG", message);
     }
 }
 

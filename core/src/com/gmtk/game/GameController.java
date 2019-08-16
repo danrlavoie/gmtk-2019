@@ -1,11 +1,12 @@
 package com.gmtk.game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
 
-public class GameController implements ControllerListener {
+public class GameController implements ControllerListener, InputProcessor {
     private GameScreen game;
     public GameController(GameScreen game) {
         super();
@@ -77,6 +78,47 @@ public class GameController implements ControllerListener {
 
     @Override
     public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
+        return false;
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        Util.betterLog("KEYDOWN", keycode);
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
         return false;
     }
 }
