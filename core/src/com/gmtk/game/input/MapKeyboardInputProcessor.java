@@ -25,10 +25,12 @@ public class MapKeyboardInputProcessor extends InputAdapter {
             mapManager.shiftHighlightedLocation(Util.Direction.DOWN);
             return true;
         }
-        return false;
-    }
-
-    public boolean keyTyped (char character) {
+        else if (keycode == Input.Keys.SPACE) {
+            if (mapManager.isActive()) {
+                mapManager.select();
+                return true;
+            }
+        }
         return false;
     }
 }
