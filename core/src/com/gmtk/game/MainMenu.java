@@ -12,24 +12,27 @@ import com.gmtk.game.input.MapKeyboardInputProcessor;
 import com.gmtk.game.input.MenuKeyboardInputProcessor;
 import com.gmtk.game.input.OverworldKeyboardInputProcessor;
 import com.gmtk.game.map.MapManager;
+import com.gmtk.game.overworld.OverworldManager;
 
 public class MainMenu implements Screen {
     final TheGame game;
     private Texture menuImage;
     private DialogManager dialogManager;
     private MapManager mapManager;
+    private OverworldManager overworldManager;
 
     public MainMenu(final TheGame game) {
         dialogManager = new DialogManager();
         dialogManager.loadBlockOfText();
         mapManager = new MapManager();
+        overworldManager = new OverworldManager();
         menuImage = new Texture(Gdx.files.internal("titlescreen.png"));
         this.game = game;
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(new DialogKeyboardInputProcessor(dialogManager));
         multiplexer.addProcessor(new MapKeyboardInputProcessor(mapManager));
         multiplexer.addProcessor(new MenuKeyboardInputProcessor());
-        multiplexer.addProcessor(new OverworldKeyboardInputProcessor());
+        multiplexer.addProcessor(new OverworldKeyboardInputProcessor(overworldManager));
         Gdx.input.setInputProcessor(multiplexer);
     }
 
@@ -38,7 +41,8 @@ public class MainMenu implements Screen {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        mapManager.render();
+        overworldManager.render();
+//        mapManager.render();
         //dialogManager.render();
 //        game.batch.begin();
 //        game.batch.draw(menuImage, 0, 0);

@@ -113,10 +113,6 @@ public class GameScreen implements Screen {
     }
 
     private void movePlayer() {
-        player.accelerateX(leftXAxisValue);
-        player.accelerateY(leftYAxisValue);
-        player.moveX(walls);
-        player.moveY(walls);
     }
 
 
