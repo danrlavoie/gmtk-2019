@@ -8,6 +8,7 @@ public class OverworldManager {
 
     public float leftXAxisValue, rightXAxisValue;
     public float leftYAxisValue, rightYAxisValue;
+    public boolean isUpKeyDown, isDownKeyDown, isLeftKeyDown, isRightKeyDown;
 
     public OverworldManager() {
         this.overworldRenderer = new OverworldRenderer();
@@ -16,17 +17,22 @@ public class OverworldManager {
         leftYAxisValue = 0;
         rightXAxisValue = 0;
         rightYAxisValue = 0;
+        isUpKeyDown = isDownKeyDown = isLeftKeyDown = isRightKeyDown = false;
     }
 
-    public void setLeftXAxisValue(float f) {
-        leftXAxisValue = f;
-    }
 
-    public void setLeftYAxisValue(float f) {
-        leftYAxisValue = f;
+
+    private void adjustAxisControls() {
+        leftXAxisValue = 0;
+        leftYAxisValue = 0;
+        if (isUpKeyDown) leftYAxisValue -= 1;
+        if (isDownKeyDown) leftYAxisValue += 1;
+        if (isLeftKeyDown) leftXAxisValue -= 1;
+        if (isRightKeyDown) leftXAxisValue += 1;
     }
 
     public void render() {
+        adjustAxisControls();
         overworldRenderer.renderBackground();
         overworldRenderer.renderObjects();
         overworldRenderer.renderActors();

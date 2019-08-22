@@ -13,25 +13,42 @@ public class OverworldKeyboardInputProcessor extends InputAdapter {
     public boolean keyDown (int keycode) {
         boolean handled = false;
         if (keycode == Input.Keys.W) {
-            overworldManager.setLeftYAxisValue(-1);
+            overworldManager.isUpKeyDown = true;
             handled = true;
         }
         if (keycode == Input.Keys.A) {
-            overworldManager.setLeftXAxisValue(-1);
+            overworldManager.isLeftKeyDown = true;
             handled = true;
         }
         if (keycode == Input.Keys.S) {
-            overworldManager.setLeftYAxisValue(1);
+            overworldManager.isDownKeyDown = true;
             handled = true;
         }
         if (keycode == Input.Keys.D) {
-            overworldManager.setLeftXAxisValue(1);
+            overworldManager.isRightKeyDown = true;
             handled = true;
         }
         return handled;
     }
 
     public boolean keyUp (int keycode) {
-        return false;
+        boolean handled = false;
+        if (keycode == Input.Keys.W) {
+            overworldManager.isUpKeyDown = false;
+            handled = true;
+        }
+        if (keycode == Input.Keys.A) {
+            overworldManager.isLeftKeyDown = false;
+            handled = true;
+        }
+        if (keycode == Input.Keys.S) {
+            overworldManager.isDownKeyDown = false;
+            handled = true;
+        }
+        if (keycode == Input.Keys.D) {
+            overworldManager.isRightKeyDown = false;
+            handled = true;
+        }
+        return handled;
     }
 }
