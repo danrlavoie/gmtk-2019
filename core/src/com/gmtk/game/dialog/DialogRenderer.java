@@ -5,13 +5,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class DialogRenderer {
     private SpriteBatch batch;
     private BitmapFont font;
     private Texture textBoxTexture;
-    private Rectangle textBox;
+    private Rectangle textBox, decisionBox;
     private long lastCharTime;
     private final long TIME_BETWEEN_CHARACTERS = 10000000;
     private boolean isFullyRendered;
@@ -25,6 +26,12 @@ public class DialogRenderer {
         this.font.getData().setScale(2,2);
         this.textBoxTexture = new Texture(Gdx.files.internal("text-box.png"));
         this.textBox = new Rectangle(0,0,textBoxTexture.getWidth(),textBoxTexture.getHeight());
+        this.decisionBox = new Rectangle(
+            textBoxTexture.getWidth() / 2,
+            textBoxTexture.getHeight() / 2,
+            textBoxTexture.getWidth(),
+            textBoxTexture.getHeight()
+        );
         this.currentChar = 0;
         this.isFullyRendered = true;
         this.lastCharTime = TimeUtils.nanoTime();
@@ -78,7 +85,18 @@ public class DialogRenderer {
             20,
             348
         );
+        renderDecision(new Array<String>());
         batch.end();
+    }
+
+    public void renderDecision(Array<String> answers) {
+        batch.draw(textBoxTexture, decisionBox.x, decisionBox.y);
+        font.draw(
+            batch,
+            "Test answer",
+            (20 + decisionBox.x),
+            (348 + decisionBox.y)
+        );
     }
 
     /**

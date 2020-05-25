@@ -43,7 +43,7 @@ public class MainMenu implements Screen {
 
         overworldManager.render();
 //        mapManager.render();
-        //dialogManager.render();
+//        dialogManager.render();
 //        game.batch.begin();
 //        game.batch.draw(menuImage, 0, 0);
         //game.font.draw(game.batch, "PRESS START TO PLAY", 800, 450);

@@ -71,20 +71,32 @@ public class Player extends Sprite {
         if (this.ySpeed > getMaxSpeed()) this.ySpeed = getMaxSpeed();
         if (this.ySpeed < -getMaxSpeed()) this.ySpeed = -getMaxSpeed();
     }
-    public void moveX() {
+    public void moveX(Array<InteractableSprite> collidables) {
         float oldX = this.getX();
         float newX = this.getX() + 14 * (this.xSpeed * Gdx.graphics.getDeltaTime());
         if (newX < 0) newX = 0;
         if (newX > ( GameScreen.CANVAS_WIDTH - this.width))
             newX = (GameScreen.CANVAS_WIDTH - this.width);
         this.setX(newX);
+        for (Sprite c : collidables) {
+            if (this.getBoundingRectangle().overlaps(c.getBoundingRectangle())) {
+                this.setX(oldX);
+                break;
+            }
+        }
     }
-    public void moveY() {
+    public void moveY(Array<InteractableSprite> collidables) {
         float oldY = this.getY();
         float newY = this.getY() + 14 * (this.ySpeed * Gdx.graphics.getDeltaTime());
         if (newY < 0) newY = 0;
         if (newY > ( GameScreen.CANVAS_HEIGHT - this.height))
             newY = ( GameScreen.CANVAS_HEIGHT - this.height);
         this.setY(newY);
+        for (Sprite c : collidables) {
+            if (this.getBoundingRectangle().overlaps(c.getBoundingRectangle())) {
+                this.setY(oldY);
+                break;
+            }
+        }
     }
 }
